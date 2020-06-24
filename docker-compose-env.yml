@@ -1,21 +1,6 @@
 version: "3.8"
 
 services:
-  os2iot-backend:
-    build: ../OS2IoT-backend
-    ports:
-      - 49160:3000
-  
-  inbound-mosquitto:
-    image: eclipse-mosquitto
-    ports:
-      - 1883:1883
-  
-  outbound-mosquitto:
-    image: eclipse-mosquitto
-    ports:
-      - 1884:1883
-      
   postgresql:
     restart: always
     image: postgres
@@ -27,6 +12,6 @@ services:
       POSTGRES_PASSWORD: toi2so
     volumes:
       - pg-data:/var/lib/postgresql:Z
-      
+
 volumes:
   pg-data:
