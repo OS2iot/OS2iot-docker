@@ -1,32 +1,45 @@
 version: "3.8"
 
 services:
+
   os2iot-backend:
     build: ../OS2IoT-backend
     ports:
-      - 49160:3000
-  
-  inbound-mosquitto:
-    image: eclipse-mosquitto
-    ports:
-      - 1883:1883
-  
-  outbound-mosquitto:
-    image: eclipse-mosquitto
-    ports:
-      - 1884:1883
+      - 3000:3000
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    depends_on:
+      - os2iot-postgresql
       
-  postgresql:
+  os2iot-postgresql:
     restart: always
     image: postgres
     ports:
-      - 5432:5432
+      - 5433:5432
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U os2iot"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
     environment:
       POSTGRES_DB: os2iot
       POSTGRES_USER: os2iot
       POSTGRES_PASSWORD: toi2so
     volumes:
       - pg-data:/var/lib/postgresql:Z
+
+  os2iot-inbound-mosquitto:
+    image: eclipse-mosquitto
+    ports:
+      - 1885:1883
+  
+  os2iot-outbound-mosquitto:
+    image: eclipse-mosquitto
+    ports:
+      - 1884:1883
       
 volumes:
   pg-data:
