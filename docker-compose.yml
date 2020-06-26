@@ -2,6 +2,14 @@ version: "3.8"
 
 services:
 
+  os2iot-frontend:
+    build: ../OS2Iot-frontend
+    volumes:
+      - '../OS2Iot-frontend:/app'
+      - '/app/node_modules'
+    ports:
+      - '4201:4200'  
+
   os2iot-backend:
     build: ../OS2IoT-backend
     ports:
