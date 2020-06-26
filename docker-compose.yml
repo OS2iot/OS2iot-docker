@@ -1,7 +1,7 @@
 version: "3.8"
 
 services:
-#Chirpstack
+  #Chirpstack
   chirpstack-network-server:
     image: chirpstack/chirpstack-network-server:3
     volumes:
@@ -44,20 +44,20 @@ services:
     ports:
       - 1883:1883
 
-#OS2IoT
+  #OS2IoT
   os2iot-frontend:
-    build: ../OS2Iot-frontend
+    build: ../OS2IoT-frontend
     volumes:
-      - '../OS2Iot-frontend:/app'
-      - '/app/node_modules'
+      - "../OS2IoT-frontend:/app"
+      - "/app/node_modules"
     ports:
-      - '4201:4200'  
+      - "4201:4200"
 
   os2iot-backend:
     build: ../OS2IoT-backend
     volumes:
-      - '../OS2IoT-backend:/tmp/os2iot/backend'
-      - '/tmp/os2iot/backend/node_modules'
+      - "../OS2IoT-backend:/tmp/os2iot/backend"
+      - "/tmp/os2iot/backend/node_modules"
     ports:
       - 3000:3000
     healthcheck:
@@ -67,7 +67,7 @@ services:
       retries: 5
     depends_on:
       - os2iot-postgresql
-      
+
   os2iot-postgresql:
     restart: always
     image: postgres
@@ -89,12 +89,12 @@ services:
     image: eclipse-mosquitto
     ports:
       - 1885:1883
-  
+
   os2iot-outbound-mosquitto:
     image: eclipse-mosquitto
     ports:
       - 1884:1883
-      
+
 volumes:
   pg-data:
   postgresqldata:
