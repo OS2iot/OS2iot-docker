@@ -12,10 +12,13 @@ services:
 
   os2iot-backend:
     build: ../OS2IoT-backend
+    volumes:
+      - '../OS2IoT-backend:/tmp/os2iot/backend'
+      - '/tmp/os2iot/backend/node_modules'
     ports:
       - 3000:3000
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:3000"]
+      test: ["CMD", "curl", "-f", "http://localhost:3000/status"]
       interval: 10s
       timeout: 5s
       retries: 5
