@@ -4,10 +4,18 @@ This repository contains the docker-compose file and configuration needed to run
 
 ## Usage
 
+Currently (for development) we mount the source-code into the front-end and back-end containers, so it's required that you clone them into the same parent directory as this project:
+```
+OS2IoT
+├── OS2IoT-backend (https://github.com/OS2iot/OS2IoT-backend)
+├── OS2IoT-docker (https://github.com/OS2iot/OS2IoT-docker)
+├── OS2IoT-frontend (https://github.com/OS2iot/OS2IoT-frontend)
+```
+
+From the `OS2IoT-docker` folder in a suitable terminal use:
 ```
 docker-compose up
 ```
-
 
 ## Configuration
 
