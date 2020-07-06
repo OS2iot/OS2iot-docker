@@ -70,7 +70,7 @@ services:
 
   os2iot-postgresql:
     restart: always
-    image: postgres
+    image: postgis/postgis # We need postgis to store geodata
     ports:
       - 5433:5432
     healthcheck:
@@ -83,6 +83,7 @@ services:
       POSTGRES_USER: os2iot
       POSTGRES_PASSWORD: toi2so
     volumes:
+      - ./configuration/os2iot-postgresql/initdb:/docker-entrypoint-initdb.d
       - pg-data:/var/lib/postgresql:Z
 
   os2iot-inbound-mosquitto:
