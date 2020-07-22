@@ -1,0 +1,30 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose -v -f docker-compose.yml convert -c -o helm-converted
+    kompose.version: 1.19.0 (f63a961c)
+  creationTimestamp: null
+  labels:
+    io.kompose.service: os2iot-outbound-mosquitto
+  name: os2iot-outbound-mosquitto
+spec:
+  replicas: 1
+  strategy: {}
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: kompose -v -f docker-compose.yml convert -c -o helm-converted
+        kompose.version: 1.19.0 (f63a961c)
+      creationTimestamp: null
+      labels:
+        io.kompose.service: os2iot-outbound-mosquitto
+    spec:
+      containers:
+      - image: eclipse-mosquitto
+        name: os2iot-outbound-mosquitto
+        ports:
+        - containerPort: 1883
+        resources: {}
+      restartPolicy: Always
+status: {}

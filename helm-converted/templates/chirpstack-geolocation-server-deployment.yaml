@@ -1,0 +1,28 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose -v -f docker-compose.yml convert -c -o helm-converted
+    kompose.version: 1.19.0 (f63a961c)
+  creationTimestamp: null
+  labels:
+    io.kompose.service: chirpstack-geolocation-server
+  name: chirpstack-geolocation-server
+spec:
+  replicas: 1
+  strategy: {}
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: kompose -v -f docker-compose.yml convert -c -o helm-converted
+        kompose.version: 1.19.0 (f63a961c)
+      creationTimestamp: null
+      labels:
+        io.kompose.service: chirpstack-geolocation-server
+    spec:
+      containers:
+      - image: chirpstack/chirpstack-geolocation-server:3
+        name: chirpstack-geolocation-server
+        resources: {}
+      restartPolicy: Always
+status: {}

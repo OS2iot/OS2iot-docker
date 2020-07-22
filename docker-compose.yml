@@ -1,4 +1,4 @@
-version: "3.8"
+version: "3"
 
 services:
   #Chirpstack
@@ -46,7 +46,8 @@ services:
 
   #OS2IoT
   os2iot-frontend:
-    build: ../OS2IoT-frontend
+    image: "os2iot-frontend"
+    build: "../OS2IoT-frontend"
     volumes:
       - "../OS2IoT-frontend:/app"
       - "/app/node_modules"
@@ -54,6 +55,7 @@ services:
       - "4201:4200"
 
   os2iot-backend:
+    image: "os2iot-backend"
     build: ../OS2IoT-backend
     volumes:
       - "../OS2IoT-backend:/tmp/os2iot/backend"

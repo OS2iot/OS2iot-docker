@@ -1,0 +1,30 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose -v -f docker-compose.yml convert -c -o helm-converted
+    kompose.version: 1.19.0 (f63a961c)
+  creationTimestamp: null
+  labels:
+    io.kompose.service: chirpstack-application-server
+  name: chirpstack-application-server
+spec:
+  replicas: 1
+  strategy: {}
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: kompose -v -f docker-compose.yml convert -c -o helm-converted
+        kompose.version: 1.19.0 (f63a961c)
+      creationTimestamp: null
+      labels:
+        io.kompose.service: chirpstack-application-server
+    spec:
+      containers:
+      - image: chirpstack/chirpstack-application-server:3
+        name: chirpstack-application-server
+        ports:
+        - containerPort: 8080
+        resources: {}
+      restartPolicy: Always
+status: {}

@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    kompose.cmd: kompose -v -f docker-compose.yml convert -c -o helm-converted
+    kompose.version: 1.19.0 (f63a961c)
+  creationTimestamp: null
+  labels:
+    io.kompose.service: os2iot-frontend
+  name: os2iot-frontend
+spec:
+  ports:
+  - name: "4201"
+    port: 4201
+    targetPort: 4200
+  selector:
+    io.kompose.service: os2iot-frontend
+status:
+  loadBalancer: {}

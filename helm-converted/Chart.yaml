@@ -1,0 +1,7 @@
+name: helm-converted
+description: A generated Helm Chart for helm-converted from Skippbox Kompose
+version: 0.0.1
+keywords:
+  - helm-converted
+sources:
+home:
