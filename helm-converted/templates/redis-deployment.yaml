@@ -1,4 +1,4 @@
-apiVersion: extensions/v1beta1
+apiVersion: networking.k8s.io/v1
 kind: Deployment
 metadata:
   annotations:
@@ -22,15 +22,15 @@ spec:
         io.kompose.service: redis
     spec:
       containers:
-      - image: redis:5-alpine
-        name: redis
-        resources: {}
-        volumeMounts:
-        - mountPath: /data
-          name: redisdata
+        - image: redis:5-alpine
+          name: redis
+          resources: {}
+          volumeMounts:
+            - mountPath: /data
+              name: redisdata
       restartPolicy: Always
       volumes:
-      - name: redisdata
-        persistentVolumeClaim:
-          claimName: redisdata
+        - name: redisdata
+          persistentVolumeClaim:
+            claimName: redisdata
 status: {}

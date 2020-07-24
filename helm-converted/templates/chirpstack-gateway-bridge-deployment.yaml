@@ -1,4 +1,4 @@
-apiVersion: extensions/v1beta1
+apiVersion: networking.k8s.io/v1
 kind: Deployment
 metadata:
   annotations:
@@ -21,11 +21,11 @@ spec:
         io.kompose.service: chirpstack-gateway-bridge
     spec:
       containers:
-      - image: chirpstack/chirpstack-gateway-bridge:3
-        name: chirpstack-gateway-bridge
-        ports:
-        - containerPort: 1700
-          protocol: UDP
-        resources: {}
+        - image: chirpstack/chirpstack-gateway-bridge:3
+          name: chirpstack-gateway-bridge
+          ports:
+            - containerPort: 1700
+              protocol: UDP
+          resources: {}
       restartPolicy: Always
 status: {}

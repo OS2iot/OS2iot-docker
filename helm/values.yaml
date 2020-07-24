@@ -2,3 +2,6 @@ global:
   DOMAIN_NAME: os2iot.dk
 apigateway:
   DOCKER_IMAGE_TAG: 1.19
+os2iot:
+  BACKEND_IMAGE_TAG: 1337
+  FRONTEND_IMAGE_TAG: latest

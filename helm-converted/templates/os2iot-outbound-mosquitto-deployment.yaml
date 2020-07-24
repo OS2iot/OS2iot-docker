@@ -1,4 +1,4 @@
-apiVersion: extensions/v1beta1
+apiVersion: networking.k8s.io/v1
 kind: Deployment
 metadata:
   annotations:
@@ -21,10 +21,10 @@ spec:
         io.kompose.service: os2iot-outbound-mosquitto
     spec:
       containers:
-      - image: eclipse-mosquitto
-        name: os2iot-outbound-mosquitto
-        ports:
-        - containerPort: 1883
-        resources: {}
+        - image: eclipse-mosquitto
+          name: os2iot-outbound-mosquitto
+          ports:
+            - containerPort: 1883
+          resources: {}
       restartPolicy: Always
 status: {}

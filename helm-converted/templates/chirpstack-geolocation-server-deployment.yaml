@@ -1,4 +1,4 @@
-apiVersion: extensions/v1beta1
+apiVersion: networking.k8s.io/v1
 kind: Deployment
 metadata:
   annotations:
@@ -21,8 +21,8 @@ spec:
         io.kompose.service: chirpstack-geolocation-server
     spec:
       containers:
-      - image: chirpstack/chirpstack-geolocation-server:3
-        name: chirpstack-geolocation-server
-        resources: {}
+        - image: chirpstack/chirpstack-geolocation-server:3
+          name: chirpstack-geolocation-server
+          resources: {}
       restartPolicy: Always
 status: {}

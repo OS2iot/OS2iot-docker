@@ -1,4 +1,4 @@
-version: "3"
+version: "3.8"
 
 services:
   #Chirpstack
@@ -56,7 +56,10 @@ services:
 
   os2iot-backend:
     image: "os2iot-backend"
-    build: ../OS2IoT-backend
+    build:
+      context: ../OS2IoT-backend
+      dockerfile: dockerfile
+      target: builder
     volumes:
       - "../OS2IoT-backend:/tmp/os2iot/backend"
       - "/tmp/os2iot/backend/node_modules"
@@ -69,12 +72,16 @@ services:
       retries: 5
     depends_on:
       - os2iot-postgresql
+    environment:
+      DATABASE_HOSTNAME: os2iot-postgresql
+      DATABASE_PORT: 5432
 
   os2iot-postgresql:
     restart: always
     image: postgis/postgis # We need postgis to store geodata
     ports:
       - 5433:5432
+    hostname: os2iot-pg
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U os2iot"]
       interval: 10s

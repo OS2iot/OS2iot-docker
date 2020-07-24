@@ -1,4 +1,4 @@
-apiVersion: extensions/v1beta1
+apiVersion: networking.k8s.io/v1
 kind: Deployment
 metadata:
   annotations:
@@ -21,19 +21,19 @@ spec:
         io.kompose.service: os2iot-backend
     spec:
       containers:
-      - image: os2iot-backend
-        livenessProbe:
-          exec:
-            command:
-            - curl
-            - -f
-            - http://localhost:3000/status
-          failureThreshold: 5
-          periodSeconds: 10
-          timeoutSeconds: 5
-        name: os2iot-backend
-        ports:
-        - containerPort: 3000
-        resources: {}
+        - image: os2iot-backend
+          livenessProbe:
+            exec:
+              command:
+                - curl
+                - -f
+                - http://localhost:3000/status
+            failureThreshold: 5
+            periodSeconds: 10
+            timeoutSeconds: 5
+          name: os2iot-backend
+          ports:
+            - containerPort: 3000
+          resources: {}
       restartPolicy: Always
 status: {}

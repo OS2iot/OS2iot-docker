@@ -1,4 +1,4 @@
-apiVersion: extensions/v1beta1
+apiVersion: networking.k8s.io/v1
 kind: Deployment
 metadata:
   annotations:
@@ -21,10 +21,10 @@ spec:
         io.kompose.service: os2iot-frontend
     spec:
       containers:
-      - image: os2iot-frontend
-        name: os2iot-frontend
-        ports:
-        - containerPort: 4200
-        resources: {}
+        - image: os2iot-frontend
+          name: os2iot-frontend
+          ports:
+            - containerPort: 4200
+          resources: {}
       restartPolicy: Always
 status: {}

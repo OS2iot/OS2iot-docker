@@ -1,4 +1,4 @@
-apiVersion: extensions/v1beta1
+apiVersion: networking.k8s.io/v1
 kind: Deployment
 metadata:
   annotations:
@@ -21,24 +21,24 @@ spec:
         io.kompose.service: os2iot-postgresql
     spec:
       containers:
-      - env:
-        - name: POSTGRES_DB
-          value: os2iot
-        - name: POSTGRES_PASSWORD
-          value: toi2so
-        - name: POSTGRES_USER
-          value: os2iot
-        image: postgis/postgis
-        livenessProbe:
-          exec:
-            command:
-            - pg_isready -U os2iot
-          failureThreshold: 5
-          periodSeconds: 10
-          timeoutSeconds: 5
-        name: os2iot-postgresql
-        ports:
-        - containerPort: 5432
-        resources: {}
+        - env:
+            - name: POSTGRES_DB
+              value: os2iot
+            - name: POSTGRES_PASSWORD
+              value: toi2so
+            - name: POSTGRES_USER
+              value: os2iot
+          image: postgis/postgis
+          livenessProbe:
+            exec:
+              command:
+                - pg_isready -U os2iot
+            failureThreshold: 5
+            periodSeconds: 10
+            timeoutSeconds: 5
+          name: os2iot-postgresql
+          ports:
+            - containerPort: 5432
+          resources: {}
       restartPolicy: Always
 status: {}
