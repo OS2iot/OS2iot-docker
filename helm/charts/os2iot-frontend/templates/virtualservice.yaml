@@ -1,0 +1,20 @@
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: "{{ $.Chart.Name }}-virtualservice"
+spec:
+  hosts:                                                                       # v - note no chart.name here.
+    - {{ .Values.INGRESS_ADDRESS | default  (printf "%s.%s" .Release.Namespace .Values.global.DOMAIN_NAME)}}
+  gateways:
+    - istio-system/istio-ingressgateway
+  http:
+    - name: {{ $.Chart.Name }}
+      route:
+        - destination:
+            port:
+              number: 4200
+            host: "{{ $.Chart.Name }}-svc"
+          headers:
+            response:
+              add:
+                Cache-Control: no-cache # Telling browsers to not cache our responses.

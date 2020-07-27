@@ -1,0 +1,15 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: {{ $.Chart.Name }}-svc
+  labels:
+    app: {{ $.Chart.Name }}
+spec:
+  type: ClusterIP
+  ports:
+    - name: http
+      port: 4200
+      targetPort: 4200
+      protocol: TCP
+  selector:
+    app: {{ $.Chart.Name }}
