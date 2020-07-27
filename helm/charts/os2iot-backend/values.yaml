@@ -7,7 +7,7 @@ CONTAINER_REGISTRY: os2iot.azurecr.io
 
 # Image that needs to be used.
 DOCKER_IMAGE_NAME: os2iot-backend
-DOCKER_IMAGE_TAG: latest
+# DOCKER_IMAGE_TAG: latest
 
 DOCKER_IMAGE_PULL_POLICY: IfNotPresent
 
