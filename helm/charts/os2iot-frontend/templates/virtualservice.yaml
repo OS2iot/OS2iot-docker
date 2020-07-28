@@ -12,7 +12,7 @@ spec:
       route:
         - destination:
             port:
-              number: 4200
+              number: 8080
             host: "{{ $.Chart.Name }}-svc"
           headers:
             response:

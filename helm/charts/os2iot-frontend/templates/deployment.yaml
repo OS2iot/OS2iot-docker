@@ -30,7 +30,7 @@ spec:
           imagePullPolicy: {{ .Values.DOCKER_IMAGE_PULL_POLICY }}
           ports:
             - name: http
-              containerPort: 4200
+              containerPort: 8080
               protocol: TCP
           resources:
             limits:
