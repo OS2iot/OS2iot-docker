@@ -53,12 +53,15 @@ services:
       - "/app/node_modules"
     ports:
       - "4201:4200"
+    environment:
+      BACKEND_HOSTNAME: os2iot-backend
+      BACKEND_PORT: 3000
 
   os2iot-backend:
     image: "os2iot-backend"
     build:
       context: ../OS2IoT-backend
-      dockerfile: dockerfile
+      dockerfile: Dockerfile
       target: builder
     volumes:
       - "../OS2IoT-backend:/tmp/os2iot/backend"
