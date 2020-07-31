@@ -78,6 +78,8 @@ services:
     environment:
       DATABASE_HOSTNAME: os2iot-postgresql
       DATABASE_PORT: 5432
+      KAFKA_HOSTNAME: os2iot-kafka
+      KAFKA_PORT: 9092
 
   os2iot-postgresql:
     restart: always
@@ -114,17 +116,24 @@ services:
       - "2181:2181"
     environment:
       - ALLOW_ANONYMOUS_LOGIN=yes
+    volumes:
+      - os2iot-zookeeperdata:/data
+    tmpfs: "/datalog"
 
   os2iot-kafka:
     image: "bitnami/kafka:latest"
     ports:
       - "9092:9092"
+      - "9093:9093"
     environment:
       - KAFKA_BROKER_ID=1
-      - KAFKA_LISTENERS=PLAINTEXT://:9092
-      - KAFKA_ADVERTISED_LISTENERS=PLAINTEXT://127.0.0.1:9092
+      - KAFKA_LISTENERS=PLAINTEXT://:9092,INTERNAL://:9093
+      - KAFKA_ADVERTISED_LISTENERS=PLAINTEXT://os2iot-kafka:9092,INTERNAL://127.0.0.1:9093
+      - KAFKA_LISTENER_SECURITY_PROTOCOL_MAP=PLAINTEXT:PLAINTEXT,INTERNAL:PLAINTEXT
       - KAFKA_ZOOKEEPER_CONNECT=os2iot-zookeeper:2181
       - ALLOW_PLAINTEXT_LISTENER=yes
+    volumes:
+      - os2iot-kafkadata:/var/lib/kafka/data
     depends_on:
       - os2iot-zookeeper
 
@@ -132,3 +141,5 @@ volumes:
   pg-data:
   postgresqldata:
   redisdata:
+  os2iot-kafkadata:
+  os2iot-zookeeperdata:
