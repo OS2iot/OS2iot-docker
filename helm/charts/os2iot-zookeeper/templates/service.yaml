@@ -1,0 +1,15 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: {{ $.Chart.Name }}-svc
+  labels:
+    app: {{ $.Chart.Name }}
+spec:
+  type: ClusterIP
+  ports:
+    - name: admin
+      port: 2181
+      targetPort: 2181
+      protocol: TCP
+  selector:
+    app: {{ $.Chart.Name }}

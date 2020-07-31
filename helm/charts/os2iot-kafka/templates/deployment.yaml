@@ -1,0 +1,59 @@
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: {{ $.Chart.Name }}
+  labels:
+    helm.sh/chart: "{{ $.Chart.Name }}-{{ $.Chart.Version }}"
+    app.kubernetes.io/name: {{ $.Chart.Name }}
+    app.kubernetes.io/instance: {{ $.Chart.Name }}-{{ .Values.DOCKER_IMAGE_TAG }}
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+spec:
+  replicas: {{ .Values.REPLICAS }}
+  selector:
+    matchLabels:
+      app: {{ $.Chart.Name }}
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+    type: RollingUpdate
+  revisionHistoryLimit: {{ .Values.REVISION_HISTORY_LIMIT }}
+  template:
+    metadata:
+      labels:
+        app: {{ $.Chart.Name }}
+        version: "{{ $.Chart.Name }}-{{ .Values.DOCKER_IMAGE_TAG }}"
+    spec:
+      containers:
+        - name: {{ $.Chart.Name }}
+          image: "{{ .Values.CONTAINER_REGISTRY }}/{{ .Values.DOCKER_IMAGE_NAME }}:{{ .Values.DOCKER_IMAGE_TAG }}"
+          imagePullPolicy: {{ .Values.DOCKER_IMAGE_PULL_POLICY }}
+          ports:
+            - name: plaintext
+              containerPort: 9092
+              protocol: TCP
+            - name: internal
+              containerPort: 9093
+              protocol: TCP
+          resources:
+            limits:
+              cpu: 150m
+              memory: 512Mi
+            requests:
+              cpu: 5m
+              memory: 128Mi
+          # Custom bellow: 
+          env:
+            - name: KAFKA_BROKER_ID
+              value: "{{ $.Values.KAFKA_BROKER_ID }}"
+            - name: KAFKA_LISTENERS
+              value: "{{ $.Values.KAFKA_LISTENERS }}"
+            - name: KAFKA_ADVERTISED_LISTENERS
+              value: "{{ $.Values.KAFKA_ADVERTISED_LISTENERS }}"
+            - name: KAFKA_LISTENER_SECURITY_PROTOCOL_MAP
+              value: "{{ $.Values.KAFKA_LISTENER_SECURITY_PROTOCOL_MAP }}"
+            - name: KAFKA_ZOOKEEPER_CONNECT
+              value: "{{ $.Values.KAFKA_ZOOKEEPER_CONNECT }}"
+            - name: ALLOW_PLAINTEXT_LISTENER
+              value: "{{ $.Values.ALLOW_PLAINTEXT_LISTENER }}"
+      restartPolicy: Always

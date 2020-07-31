@@ -1,0 +1,19 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: {{ $.Chart.Name }}-svc
+  labels:
+    app: {{ $.Chart.Name }}
+spec:
+  type: ClusterIP
+  ports:
+    - name: plaintext
+      port: 9092
+      targetPort: 9092
+      protocol: TCP
+    - name: internal
+      port: 9093
+      targetPort: 9093
+      protocol: TCP
+  selector:
+    app: {{ $.Chart.Name }}
