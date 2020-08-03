@@ -44,4 +44,8 @@ spec:
               value: os2iot-postgres-svc
             - name: DATABASE_PORT
               value: '5432'
+            - name: KAFKA_HOSTNAME
+              value: os2iot-kafka-svc
+            - name: KAFKA_PORT
+              value: '9092'
       restartPolicy: Always
