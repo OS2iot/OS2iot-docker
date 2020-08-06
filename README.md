@@ -62,3 +62,15 @@ Solution:
 docker-compose down --volumes
 dos2unix configuration/os2iot-postgresql/initdb/\* <-- Skal køres fra git bash
 docker-compose up
+
+### error: Error: connect ETIMEDOUT xxx.xxx.xxx.xxx:xxxx at TCPConnectWrap.afterConnect [as oncomplete] (net.js:1141:16)
+
+Cause:
+Docker is trying to connect to the wrong ip.
+
+Solution:
+1. Navigate to hosts file: C:\Windows\System32\drivers\etc
+2. Open hosts file as administrator
+3. Change related ip of host.docker.internal and gateway.docker.internal to your new ip (found in terminal using the ipconfig command: e.g. 192.168.0.1)
+4. save
+5. restart the application.
