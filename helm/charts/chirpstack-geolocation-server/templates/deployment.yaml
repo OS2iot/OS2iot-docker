@@ -28,6 +28,10 @@ spec:
         - name: {{ $.Chart.Name }}
           image: "{{ .Values.CONTAINER_REGISTRY }}/{{ .Values.DOCKER_IMAGE_NAME }}:{{ .Values.DOCKER_IMAGE_TAG }}"
           imagePullPolicy: {{ .Values.DOCKER_IMAGE_PULL_POLICY }}
+          ports:
+            - name: http
+              containerPort: 8081
+              protocol: TCP
           resources:
             limits:
               cpu: 150m
