@@ -43,16 +43,16 @@ spec:
           env:
             - name: POSTGRES_PASSWORD
               value: root
-          readinessProbe:
-            exec:
-              command: ["psql", "-w", "-U", "os2iot", "-d", "os2iot", "-c", "SELECT 1"]
-            initialDelaySeconds: 15
-            timeoutSeconds: 2
-          livenessProbe:
-            exec:
-              command: ["psql", "-w", "-U", "os2iot", "-d", "os2iot", "-c", "SELECT 1"]
-            initialDelaySeconds: 45
-            timeoutSeconds: 2
+#          readinessProbe:
+#            exec:
+#              command: ["psql", "-w", "-U", "os2iot", "-d", "os2iot", "-c", "SELECT 1"]
+#            initialDelaySeconds: 15
+#            timeoutSeconds: 2
+#          livenessProbe:
+#            exec:
+#              command: ["psql", "-w", "-U", "os2iot", "-d", "os2iot", "-c", "SELECT 1"]
+#            initialDelaySeconds: 45
+#            timeoutSeconds: 2
           volumeMounts:
             - name: {{ $.Chart.Name }}-configmap
               mountPath: /docker-entrypoint-initdb.d/001-init-chirpstack_ns.sh
