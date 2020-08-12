@@ -8,7 +8,7 @@ data: # Remember this contains passwords - might be an idea to use secrets and e
     # configuration example and documentation.
     
     [postgresql]
-    dsn="postgres://chirpstack_as:chirpstack_as@postgresql-svc/chirpstack_as?sslmode=disable"
+    dsn="postgres://chirpstack_as:chirpstack_as@postgres-svc/chirpstack_as?sslmode=disable"
     
     [redis]
     url="redis://redis-svc:6379"
