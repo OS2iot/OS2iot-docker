@@ -1,0 +1,15 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: {{ $.Chart.Name }}-svc
+  labels:
+    app: {{ $.Chart.Name }}
+spec:
+  type: ClusterIP
+  ports:
+    - name: udp
+      port: 1700
+      targetPort: 1700
+      protocol: UDP
+  selector:
+    app: {{ $.Chart.Name }}
