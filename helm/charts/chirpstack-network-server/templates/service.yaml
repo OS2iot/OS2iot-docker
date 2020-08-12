@@ -9,7 +9,7 @@ spec:
   ports:
     - name: http
       port: 8000
-      targetPort: 8080
+      targetPort: 8000
       protocol: TCP
   selector:
     app: {{ $.Chart.Name }}
