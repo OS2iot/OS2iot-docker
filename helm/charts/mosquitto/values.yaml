@@ -7,7 +7,7 @@
 
 # Image that needs to be used.
 DOCKER_IMAGE_NAME: eclipse-mosquitto
-# DOCKER_IMAGE_TAG: 5-alpine
+DOCKER_IMAGE_TAG: latest
 
 DOCKER_IMAGE_PULL_POLICY: IfNotPresent
 
