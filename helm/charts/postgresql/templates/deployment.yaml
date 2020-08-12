@@ -26,7 +26,7 @@ spec:
     spec:
       containers:
         - name: {{ $.Chart.Name }}
-          image: "{{ .Values.CONTAINER_REGISTRY }}/{{ .Values.DOCKER_IMAGE_NAME }}:{{ .Values.DOCKER_IMAGE_TAG }}"
+          image: "{{ .Values.DOCKER_IMAGE_NAME }}:{{ .Values.DOCKER_IMAGE_TAG }}"
           imagePullPolicy: {{ .Values.DOCKER_IMAGE_PULL_POLICY }}
           ports:
             - name: db

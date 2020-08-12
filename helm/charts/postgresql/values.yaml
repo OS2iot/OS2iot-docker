@@ -3,7 +3,7 @@
 # Declare variables to be passed into your templates.
 
 # Registry the image comes from
-CONTAINER_REGISTRY: postgres
+# CONTAINER_REGISTRY: postgres
 
 # Image that needs to be used.
 DOCKER_IMAGE_NAME: postgres
