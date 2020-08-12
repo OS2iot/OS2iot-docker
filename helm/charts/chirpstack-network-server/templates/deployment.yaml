@@ -28,10 +28,6 @@ spec:
         - name: {{ $.Chart.Name }}
           image: "{{ .Values.CONTAINER_REGISTRY }}/{{ .Values.DOCKER_IMAGE_NAME }}:{{ .Values.DOCKER_IMAGE_TAG }}"
           imagePullPolicy: {{ .Values.DOCKER_IMAGE_PULL_POLICY }}
-          ports:
-            - name: http
-              containerPort: 8080
-              protocol: TCP
           resources:
             limits:
               cpu: 150m
@@ -41,8 +37,8 @@ spec:
               memory: 128Mi
           volumeMounts:
             - name: {{ $.Chart.Name }}-configmap
-              mountPath: /etc/chirpstack-application-server/chirpstack-application-server.toml
-              subPath: chirpstack-application-server.toml
+              mountPath: /etc/chirpstack-network-server/chirpstack-network-server.toml
+              subPath: chirpstack-network-server.toml
       volumes:
         - name: "{{ $.Chart.Name }}-configmap"
           configMap:

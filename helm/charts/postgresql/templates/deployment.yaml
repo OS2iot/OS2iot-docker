@@ -1,0 +1,73 @@
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: {{ $.Chart.Name }}
+  labels:
+    helm.sh/chart: "{{ $.Chart.Name }}-{{ $.Chart.Version }}"
+    app.kubernetes.io/name: {{ $.Chart.Name }}
+    app.kubernetes.io/instance: {{ $.Chart.Name }}-{{ .Values.DOCKER_IMAGE_TAG }}
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+spec:
+  replicas: {{ .Values.REPLICAS }}
+  selector:
+    matchLabels:
+      app: {{ $.Chart.Name }}
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+    type: RollingUpdate
+  revisionHistoryLimit: {{ .Values.REVISION_HISTORY_LIMIT }}
+  template:
+    metadata:
+      labels:
+        app: {{ $.Chart.Name }}
+        version: "{{ $.Chart.Name }}-{{ .Values.DOCKER_IMAGE_TAG }}"
+    spec:
+      containers:
+        - name: {{ $.Chart.Name }}
+          image: "{{ .Values.CONTAINER_REGISTRY }}/{{ .Values.DOCKER_IMAGE_NAME }}:{{ .Values.DOCKER_IMAGE_TAG }}"
+          imagePullPolicy: {{ .Values.DOCKER_IMAGE_PULL_POLICY }}
+          ports:
+            - name: db
+              containerPort: 5432
+              protocol: TCP
+          resources:
+            limits:
+              cpu: 150m
+              memory: 512Mi
+            requests:
+              cpu: 5m
+              memory: 128Mi
+          # Custom bellow: 
+          env:
+            - name: POSTGRES_PASSWORD
+              value: root
+         readinessProbe:
+           exec:
+             command: ["psql", "-w", "-U", "os2iot", "-d", "os2iot", "-c", "SELECT 1"]
+           initialDelaySeconds: 15
+           timeoutSeconds: 2
+         livenessProbe:
+           exec:
+             command: ["psql", "-w", "-U", "os2iot", "-d", "os2iot", "-c", "SELECT 1"]
+           initialDelaySeconds: 45
+           timeoutSeconds: 2
+          volumeMounts:
+            - name: {{ $.Chart.Name }}-configmap
+              mountPath: /docker-entrypoint-initdb.d/001-init-chirpstack_ns.sh
+              subPath: 001-init-chirpstack_ns.sh
+            - name: {{ $.Chart.Name }}-configmap
+              mountPath: /docker-entrypoint-initdb.d/002-init-chirpstack_as.sh
+              subPath: 002-init-chirpstack_as.sh
+            - name: {{ $.Chart.Name }}-configmap
+              mountPath: /docker-entrypoint-initdb.d/003-chirpstack_as_trgm.sh
+              subPath: 003-chirpstack_as_trgm.sh
+            - name: {{ $.Chart.Name }}-configmap
+              mountPath: /docker-entrypoint-initdb.d/004-chirpstack_as_hstore.sh
+              subPath: 004-chirpstack_as_hstore.sh
+      volumes:
+      - name: "{{ $.Chart.Name }}-configmap"
+        configMap:
+        name: "{{ $.Chart.Name }}-configmap"
+      restartPolicy: Always
