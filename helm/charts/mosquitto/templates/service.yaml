@@ -1,0 +1,15 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: {{ $.Chart.Name }}-svc
+  labels:
+    app: {{ $.Chart.Name }}
+spec:
+  type: ClusterIP
+  ports:
+    - name: mosquitto
+      port: 1883
+      targetPort: 1883
+      protocol: TCP
+  selector:
+    app: {{ $.Chart.Name }}
