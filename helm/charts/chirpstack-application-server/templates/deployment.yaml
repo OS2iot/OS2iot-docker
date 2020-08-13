@@ -32,7 +32,7 @@ spec:
             - name: http
               containerPort: 8080
               protocol: TCP
-            - name: http-to-network-server
+            - name: http-to-ns
               containerPort: 8001
               protocol: TCP
           resources:
