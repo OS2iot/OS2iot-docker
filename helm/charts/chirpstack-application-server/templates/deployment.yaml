@@ -35,6 +35,9 @@ spec:
             - name: http-to-ns
               containerPort: 8001
               protocol: TCP
+            - name: http-join
+              containerPort: 8003
+              protocol: TCP
           resources:
             limits:
               cpu: 150m
