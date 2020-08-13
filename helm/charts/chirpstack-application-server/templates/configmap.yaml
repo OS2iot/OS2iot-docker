@@ -17,8 +17,10 @@ data: # Remember this contains passwords - might be an idea to use secrets and e
     server="tcp://mosquitto-svc:1883"
     
     [application_server.api]
+    bind="0.0.0.0:8001"
     public_host="chirpstack-application-server-svc:8001"
     
     [application_server.external_api]
     bind="0.0.0.0:8080"
     jwt_secret="verysecret"
+    # cors_allow_origin="*"

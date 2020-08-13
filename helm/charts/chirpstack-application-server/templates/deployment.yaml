@@ -32,6 +32,9 @@ spec:
             - name: http
               containerPort: 8080
               protocol: TCP
+            - name: http-to-network-server
+              containerPort: 8001
+              protocol: TCP
           resources:
             limits:
               cpu: 150m
