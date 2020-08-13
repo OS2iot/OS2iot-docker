@@ -11,5 +11,9 @@ spec:
       port: 8080
       targetPort: 8080
       protocol: TCP
+    - name: http-to-ns
+      port: 8001
+      targetPort: 8001
+      protocol: TCP
   selector:
     app: {{ $.Chart.Name }}
