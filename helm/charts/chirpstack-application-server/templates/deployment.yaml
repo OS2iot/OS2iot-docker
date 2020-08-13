@@ -32,10 +32,10 @@ spec:
             - name: http
               containerPort: 8080
               protocol: TCP
-            - name: http-to-ns
+            - name: grpc-to-ns
               containerPort: 8001
               protocol: TCP
-            - name: http-join
+            - name: grpc-join
               containerPort: 8003
               protocol: TCP
           resources:

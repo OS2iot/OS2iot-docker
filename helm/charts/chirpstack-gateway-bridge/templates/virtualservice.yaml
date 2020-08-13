@@ -14,7 +14,3 @@ spec:
             port:
               number: 1700
             host: "{{ $.Chart.Name }}-svc"
-          headers:
-            response:
-              add:
-                Cache-Control: no-cache # Telling browsers to not cache our responses.

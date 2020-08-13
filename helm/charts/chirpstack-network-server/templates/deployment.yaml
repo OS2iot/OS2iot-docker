@@ -29,7 +29,7 @@ spec:
           image: "{{ .Values.CONTAINER_REGISTRY }}/{{ .Values.DOCKER_IMAGE_NAME }}:{{ .Values.DOCKER_IMAGE_TAG }}"
           imagePullPolicy: {{ .Values.DOCKER_IMAGE_PULL_POLICY }}
           ports:
-            - name: tcp
+            - name: grpc
               containerPort: 8000
               protocol: TCP
           resources:

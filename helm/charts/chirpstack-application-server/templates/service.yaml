@@ -11,11 +11,11 @@ spec:
       port: 8080
       targetPort: 8080
       protocol: TCP
-    - name: http-to-ns
+    - name: grpc-to-ns
       port: 8001
       targetPort: 8001
       protocol: TCP    
-    - name: http-join
+    - name: grpc-join
       port: 8003
       targetPort: 8003
       protocol: TCP
