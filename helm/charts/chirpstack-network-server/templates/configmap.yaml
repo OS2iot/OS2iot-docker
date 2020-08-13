@@ -9,6 +9,8 @@ data: # Remember this contains passwords - might be an idea to use secrets and e
     #
     # This file is for the EU868 band. See the examples/ folder for more
     # configuration examples.
+    [general]
+    log_level=5
 
     [postgresql]
     dsn="postgres://chirpstack_ns:chirpstack_ns@postgres-svc/chirpstack_ns?sslmode=disable"

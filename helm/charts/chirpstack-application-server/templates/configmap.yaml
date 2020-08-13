@@ -6,6 +6,8 @@ data: # Remember this contains passwords - might be an idea to use secrets and e
   chirpstack-application-server.toml: |
     # See https://www.chirpstack.io/application-server/install/config/ for a full
     # configuration example and documentation.
+    [general]
+    log_level=5
     
     [postgresql]
     dsn="postgres://chirpstack_as:chirpstack_as@postgres-svc/chirpstack_as?sslmode=disable"
