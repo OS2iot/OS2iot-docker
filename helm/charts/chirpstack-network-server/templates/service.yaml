@@ -1,0 +1,15 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: {{ $.Chart.Name }}-svc
+  labels:
+    app: {{ $.Chart.Name }}
+spec:
+  type: ClusterIP
+  ports:
+    - name: grpc
+      port: 8000
+      targetPort: 8000
+      protocol: TCP
+  selector:
+    app: {{ $.Chart.Name }}

@@ -29,8 +29,8 @@ spec:
           image: "{{ .Values.CONTAINER_REGISTRY }}/{{ .Values.DOCKER_IMAGE_NAME }}:{{ .Values.DOCKER_IMAGE_TAG }}"
           imagePullPolicy: {{ .Values.DOCKER_IMAGE_PULL_POLICY }}
           ports:
-            - name: http
-              containerPort: 3000
+            - name: grpc
+              containerPort: 8000
               protocol: TCP
           resources:
             limits:
@@ -39,17 +39,12 @@ spec:
             requests:
               cpu: 5m
               memory: 128Mi
-          env:
-            - name: DATABASE_HOSTNAME
-              value: os2iot-postgres-svc
-            - name: DATABASE_PORT
-              value: '5432'
-            - name: KAFKA_HOSTNAME
-              value: os2iot-kafka-svc
-            - name: KAFKA_PORT
-              value: '9092'
-            - name: CHIRPSTACK_APPLICATION_SERVER_HOSTNAME
-              value: chirpstack-application-server-svc
-            - name: CHIRPSTACK_NETWORK_SERVER
-              value: chirpstack-network-server-svc
+          volumeMounts:
+            - name: {{ $.Chart.Name }}-configmap
+              mountPath: /etc/chirpstack-network-server/chirpstack-network-server.toml
+              subPath: chirpstack-network-server.toml
+      volumes:
+        - name: "{{ $.Chart.Name }}-configmap"
+          configMap:
+            name: "{{ $.Chart.Name }}-configmap"
       restartPolicy: Always
