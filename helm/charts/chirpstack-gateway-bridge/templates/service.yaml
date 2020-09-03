@@ -5,7 +5,7 @@ metadata:
   labels:
     app: {{ $.Chart.Name }}
 spec:
-  type: ClusterIP
+  type: LoadBalancer
   ports:
     - name: udp
       port: 1700
