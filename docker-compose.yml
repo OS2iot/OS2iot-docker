@@ -80,6 +80,8 @@ services:
       DATABASE_PORT: 5432
       KAFKA_HOSTNAME: os2iot-kafka
       KAFKA_PORT: 9092
+      CS_MQTT_HOSTNAME: mosquitto
+      CS_MQTT_PORT: 1883
 
   os2iot-postgresql:
     restart: always

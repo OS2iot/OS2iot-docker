@@ -52,4 +52,8 @@ spec:
               value: chirpstack-application-server-svc
             - name: CHIRPSTACK_NETWORK_SERVER
               value: chirpstack-network-server-svc
+            - name: CS_MQTT_HOSTNAME
+              value: mosquitto-svc
+            - name: CS_MQTT_PORT
+              value: '1883'
       restartPolicy: Always
