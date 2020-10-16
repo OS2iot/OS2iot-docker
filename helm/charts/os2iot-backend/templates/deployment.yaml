@@ -56,4 +56,6 @@ spec:
               value: mosquitto-svc
             - name: CS_MQTT_PORT
               value: '1883'
+            - name: BACKEND_BASEURL
+              value: 'https://test-os2iot-backend.os2iot.dk'
       restartPolicy: Always
