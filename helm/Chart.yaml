@@ -21,9 +21,6 @@ version: 0.1.0
 appVersion: 1.16.0
 
 dependencies:
-  - name: apigateway
-    version: "0.1.1"
-    repository: "file://charts/apigateway"
   - name: os2iot-postgres
     version: "1.0"
     repository: "file://charts/os2iot-postgres"
