@@ -7,9 +7,9 @@ CONTAINER_REGISTRY: chirpstack
 
 # Image that needs to be used.
 DOCKER_IMAGE_NAME: chirpstack-network-server
-DOCKER_IMAGE_TAG: latest
+DOCKER_IMAGE_TAG: 3
 
-DOCKER_IMAGE_PULL_POLICY: IfNotPresent
+DOCKER_IMAGE_PULL_POLICY: Always
 
 # How many replicas of the pod?
 REPLICAS: 1
