@@ -24,6 +24,7 @@ spec:
         app: {{ $.Chart.Name }}
         version: "{{ $.Chart.Name }}-{{ .Values.DOCKER_IMAGE_TAG }}"
     spec:
+      restartPolicy: Always
       containers:
         - name: {{ $.Chart.Name }}
           image: "{{ .Values.CONTAINER_REGISTRY }}/{{ .Values.DOCKER_IMAGE_NAME }}:{{ .Values.DOCKER_IMAGE_TAG }}"
@@ -58,4 +59,3 @@ spec:
               value: '1883'
             - name: BACKEND_BASEURL
               value: 'https://test-os2iot-backend.os2iot.dk'
-      restartPolicy: Always
