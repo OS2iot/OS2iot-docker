@@ -59,3 +59,5 @@ spec:
               value: '1883'
             - name: BACKEND_BASEURL
               value: 'https://test-os2iot-backend.os2iot.dk'
+            - name: KOMBIT_CERTIFICATEPRIVATEKEY
+              value: {{ .Values.KOMBIT_CERTIFICATEPRIVATEKEY }}
