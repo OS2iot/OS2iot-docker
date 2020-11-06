@@ -8,14 +8,14 @@ services:
       - ./configuration/chirpstack-network-server:/etc/chirpstack-network-server
 
   chirpstack-application-server:
-    image: chirpstack/chirpstack-application-server:3
+    image: chirpstack/chirpstack-application-server:3.12.2
     ports:
       - 8080:8080
     volumes:
       - ./configuration/chirpstack-application-server:/etc/chirpstack-application-server
 
   chirpstack-gateway-bridge:
-    image: chirpstack/chirpstack-gateway-bridge:3
+    image: chirpstack/chirpstack-gateway-bridge:3.9
     ports:
       - 1700:1700/udp
     volumes:

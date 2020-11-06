@@ -7,7 +7,7 @@ CONTAINER_REGISTRY: chirpstack
 
 # Image that needs to be used.
 DOCKER_IMAGE_NAME: chirpstack-network-server
-DOCKER_IMAGE_TAG: 3
+DOCKER_IMAGE_TAG: 3.10
 
 DOCKER_IMAGE_PULL_POLICY: Always
 
