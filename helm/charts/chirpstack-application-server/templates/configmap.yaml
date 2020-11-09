@@ -26,3 +26,17 @@ data: # Remember this contains passwords - might be an idea to use secrets and e
     bind="0.0.0.0:8080"
     jwt_secret="verysecret"
     # cors_allow_origin="*"
+
+    # Integration configures the data integration.
+    #
+    # This is the data integration which is available for all applications,
+    # besides the extra integrations that can be added on a per-application
+    # basis.
+    [application_server.integration]
+    # Payload marshaler.
+    #
+    # This defines how the MQTT payloads are encoded. Valid options are:
+    # * protobuf:  Protobuf encoding
+    # * json:      JSON encoding (easier for debugging, but less compact than 'protobuf')
+    # * json_v3:   v3 JSON (will be removed in the next major release)
+    marshaler="protobuf"

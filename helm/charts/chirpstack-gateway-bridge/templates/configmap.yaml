@@ -11,4 +11,11 @@ data: # Remember this contains passwords - might be an idea to use secrets and e
     servers=["tcp://mosquitto-svc:1883"]
     username=""
     password=""
-
+    # Integration configuration.
+    [integration]
+    # Payload marshaler.
+    #
+    # This defines how the MQTT payloads are encoded. Valid options are:
+    # * protobuf:  Protobuf encoding
+    # * json:      JSON encoding (easier for debugging, but less compact than 'protobuf')
+    marshaler="protobuf"
