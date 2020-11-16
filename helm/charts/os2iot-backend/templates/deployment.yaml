@@ -40,6 +40,12 @@ spec:
             requests:
               cpu: 5m
               memory: 128Mi
+          livenessProbe:
+            httpGet:
+              path: /api/v1/heathcheck
+              port: 3000
+            initialDelaySeconds: 30
+            periodSeconds: 3
           env:
             - name: DATABASE_HOSTNAME
               value: os2iot-postgres-svc
