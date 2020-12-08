@@ -49,12 +49,11 @@ services:
   #OS2IoT
   os2iot-frontend:
     image: "os2iot-frontend"
-    build: "../OS2IoT-frontend"
-    volumes:
-      - "../OS2IoT-frontend:/app"
-      - "/app/node_modules"
+    build: 
+      context: "../OS2IoT-frontend"
+      dockerfile: "Dockerfile-prod"
     ports:
-      - "4201:4200"
+      - "8081:8081"
     environment:
       BACKEND_HOSTNAME: os2iot-backend
       BACKEND_PORT: 3000
@@ -64,10 +63,7 @@ services:
     build:
       context: ../OS2IoT-backend
       dockerfile: Dockerfile
-      target: builder
-    volumes:
-      - "../OS2IoT-backend:/tmp/os2iot/backend"
-      - "/tmp/os2iot/backend/node_modules"
+      target: prod
     ports:
       - 3000:3000
     healthcheck:
@@ -84,6 +80,8 @@ services:
       KAFKA_PORT: 9092
       CS_MQTT_HOSTNAME: mosquitto
       CS_MQTT_PORT: 1883
+      CHIRPSTACK_APPLICATION_SERVER_HOSTNAME: chirpstack-application-server
+      CHIRPSTACK_NETWORK_SERVER: chirpstack-network-server
 
   os2iot-postgresql:
     restart: always
