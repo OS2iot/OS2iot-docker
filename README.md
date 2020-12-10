@@ -2,6 +2,8 @@
 
 This repository contains the docker-compose file and configuration needed to run the OS2IoT project.
 
+Documentation is available at: https://os2iot.readthedocs.io/en/latest/
+
 ## Usage
 
 Currently (for development) we mount the source-code into the front-end and back-end containers, so it's required that you clone them into the same parent directory as this project:
@@ -28,7 +30,7 @@ Edit the files in the configuration folder to adjust settings for each requireme
 - Postgres from the official image.
 - Chirpstack using their docker-compose
 
-## Troubleshooting
+## Troubleshooting FAQ
 
 ### Docker File Sharing issues
 
