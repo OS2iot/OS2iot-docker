@@ -39,4 +39,12 @@ spec:
             requests:
               cpu: 5m
               memory: 128Mi
+          volumeMounts:
+            - name: {{ $.Chart.Name }}-configmap
+              mountPath: /mosquitto/config/mosquitto.conf
+              subPath: mosquitto.conf
+      volumes:
+        - name: "{{ $.Chart.Name }}-configmap"
+          configMap:
+            name: "{{ $.Chart.Name }}-configmap"
       restartPolicy: Always
