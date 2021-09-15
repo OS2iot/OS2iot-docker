@@ -42,9 +42,11 @@ services:
       - redisdata:/data
 
   mosquitto:
-    image: eclipse-mosquitto:1.6.12
+    image: eclipse-mosquitto:2
     ports:
       - 1883:1883
+    volumes: 
+    - ./configuration/eclipse-mosquitto/mosquitto.conf:/mosquitto/config/mosquitto.conf
 
   #OS2IoT
   os2iot-frontend:
@@ -101,16 +103,7 @@ services:
     volumes:
       - ./configuration/os2iot-postgresql/initdb:/docker-entrypoint-initdb.d
       - pg-data:/var/lib/postgresql:Z
-
-  os2iot-inbound-mosquitto:
-    image: eclipse-mosquitto:1.6.12
-    ports:
-      - 1885:1883
-
-  os2iot-outbound-mosquitto:
-    image: eclipse-mosquitto:1.6.12
-    ports:
-      - 1884:1883
+      
 
   os2iot-zookeeper:
     image: "bitnami/zookeeper:latest"
