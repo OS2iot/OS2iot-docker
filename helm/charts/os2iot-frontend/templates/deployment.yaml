@@ -39,9 +39,7 @@ spec:
             requests:
               cpu: 5m
               memory: 128Mi
-          env:
-            - name: DATABASE_HOSTNAME
-              value: os2iot-postgres-svc
-            - name: DATABASE_PORT
-              value: '5432'
+          envFrom:
+            - configMapRef:
+                name: {{ $.Chart.Name }}-configmap
       restartPolicy: Always
