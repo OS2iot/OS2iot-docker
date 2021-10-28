@@ -56,7 +56,3 @@ data: # Remember this contains passwords - might be an idea to use secrets and e
 
     [join_server.default]
     server="http://chirpstack-application-server-svc:8003"
-
-    [geolocation_server]
-    server="chirpstack-geolocation-server-svc:8005"
-
