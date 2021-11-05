@@ -3,28 +3,23 @@ version: "3.8"
 services:
   #Chirpstack
   chirpstack-network-server:
-    image: chirpstack/chirpstack-network-server:3
+    image: chirpstack/chirpstack-network-server:3.15
     volumes:
       - ./configuration/chirpstack-network-server:/etc/chirpstack-network-server
 
   chirpstack-application-server:
-    image: chirpstack/chirpstack-application-server:3.12.2
+    image: chirpstack/chirpstack-application-server:3.17
     ports:
       - 8080:8080
     volumes:
       - ./configuration/chirpstack-application-server:/etc/chirpstack-application-server
 
   chirpstack-gateway-bridge:
-    image: chirpstack/chirpstack-gateway-bridge:3.9
+    image: chirpstack/chirpstack-gateway-bridge:3.13
     ports:
       - 1700:1700/udp
     volumes:
       - ./configuration/chirpstack-gateway-bridge:/etc/chirpstack-gateway-bridge
-
-  chirpstack-geolocation-server:
-    image: chirpstack/chirpstack-geolocation-server:3
-    volumes:
-      - ./configuration/chirpstack-geolocation-server:/etc/chirpstack-geolocation-server
 
   postgresql:
     image: postgres:9.6-alpine
@@ -57,8 +52,9 @@ services:
     ports:
       - "8081:8081"
     environment:
-      BACKEND_HOSTNAME: os2iot-backend
-      BACKEND_PORT: 3000
+      PRODUCTION: false
+      BASE_URL: http://localhost:3000/api/v1/
+      TABLE_PAGE_SIZE: 20
 
   os2iot-backend:
     image: "os2iot-backend"
