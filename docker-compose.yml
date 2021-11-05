@@ -57,8 +57,6 @@ services:
     ports:
       - "8081:8081"
     environment:
-      BACKEND_HOSTNAME: os2iot-backend
-      BACKEND_PORT: 3000
       PRODUCTION: false
       BASE_URL: http://localhost:3000/api/v1/
       TABLE_PAGE_SIZE: 20

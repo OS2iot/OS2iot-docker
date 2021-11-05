@@ -2,7 +2,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: {{ $.Chart.Name }}-configmap
-data: # Remember this contains passwords - might be an idea to use secrets and environment variables instead.
+data:
   PRODUCTION: "true"
   BASE_URL: "http://localhost:3000/api/v1/"
   TABLE_PAGE_SIZE: "20"
