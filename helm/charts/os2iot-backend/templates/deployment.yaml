@@ -69,3 +69,5 @@ spec:
               value: "{{ .Values.KOMBIT_CERTIFICATEPRIVATEKEY }}"
             - name: KOMBIT_ENTRYPOINT
               value: "{{ .Values.KOMBIT_ENTRYPOINT }}"
+            - name: LOG_LEVEL
+              value: error
