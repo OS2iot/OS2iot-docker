@@ -80,6 +80,7 @@ services:
       CS_MQTT_PORT: 1883
       CHIRPSTACK_APPLICATION_SERVER_HOSTNAME: chirpstack-application-server
       CHIRPSTACK_NETWORK_SERVER: chirpstack-network-server
+      LOG_LEVEL: debug
 
   os2iot-postgresql:
     restart: always
