@@ -40,19 +40,19 @@ services:
     image: eclipse-mosquitto:2
     ports:
       - 1883:1883
-    volumes: 
-    - ./configuration/eclipse-mosquitto/mosquitto.conf:/mosquitto/config/mosquitto.conf
+    volumes:
+      - ./configuration/eclipse-mosquitto/mosquitto.conf:/mosquitto/config/mosquitto.conf
 
   #OS2IoT
   os2iot-frontend:
     image: "os2iot-frontend"
-    build: 
+    build:
       context: "../OS2IoT-frontend"
       dockerfile: "Dockerfile-prod"
     ports:
       - "8081:8081"
     environment:
-      PRODUCTION: false
+      PRODUCTION: "false"
       BASE_URL: http://localhost:3000/api/v1/
       TABLE_PAGE_SIZE: 20
 
@@ -100,7 +100,6 @@ services:
     volumes:
       - ./configuration/os2iot-postgresql/initdb:/docker-entrypoint-initdb.d
       - pg-data:/var/lib/postgresql:Z
-      
 
   os2iot-zookeeper:
     image: "bitnami/zookeeper:latest"
