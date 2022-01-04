@@ -56,6 +56,15 @@ services:
       BASE_URL: http://localhost:3000/api/v1/
       TABLE_PAGE_SIZE: 20
 
+  #OS2IoT
+  os2iot-lorawanSimulator:
+    image: "os2iot-lorawan_simulator"
+    build:
+      context: "./simulator"
+      dockerfile: "Dockerfile"
+    ports:
+      - "8768:8000"
+
   os2iot-backend:
     image: "os2iot-backend"
     build:
