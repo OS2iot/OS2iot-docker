@@ -63,7 +63,7 @@ services:
       context: "./Simulator"
       dockerfile: "Dockerfile"
     ports:
-      - "8000:8000"
+      - "8768:8000"
 
   os2iot-backend:
     image: "os2iot-backend"
