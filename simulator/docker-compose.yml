@@ -1,0 +1,8 @@
+services:
+  os2iot-lorawanSimulator:
+    image: "os2iot-lorawan_simulator"
+    build:
+      context: "./"
+      dockerfile: "Dockerfile"
+    ports:
+      - "8768:8000"
