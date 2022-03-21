@@ -54,7 +54,7 @@ services:
     environment:
       PRODUCTION: "false"
       BASE_URL: http://localhost:3000/api/v1/
-      TABLE_PAGE_SIZE: 20
+      TABLE_PAGE_SIZE: 25
 
   #OS2IoT
   os2iot-lorawanSimulator:
