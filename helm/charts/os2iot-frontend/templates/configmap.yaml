@@ -5,4 +5,4 @@ metadata:
 data:
   PRODUCTION: "true"
   BASE_URL: "http://localhost:3000/api/v1/"
-  TABLE_PAGE_SIZE: "20"
+  TABLE_PAGE_SIZE: "25"
