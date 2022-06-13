@@ -71,3 +71,13 @@ spec:
               value: "{{ .Values.KOMBIT_ENTRYPOINT }}"
             - name: LOG_LEVEL
               value: error
+            - name: EMAIL_PORT
+              value: '587'
+            - name: EMAIL_HOST
+              value: smtp.ethereal.email
+            - name: EMAIL_USER
+              value: some-login-email@somehost.dk
+            - name: EMAIL_PASS
+              value: some-login-pass
+            - name: EMAIL_FROM
+              value: some-from-email@somehost.dk
