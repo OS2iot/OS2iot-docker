@@ -90,6 +90,11 @@ services:
       CHIRPSTACK_APPLICATION_SERVER_HOSTNAME: chirpstack-application-server
       CHIRPSTACK_NETWORK_SERVER: chirpstack-network-server
       LOG_LEVEL: debug
+      EMAIL_PORT: 587
+      EMAIL_HOST: smtp.ethereal.email # Change this for sending emails with OS2iot
+      EMAIL_USER: some-login-email@somehost.dk # Change this for sending emails with OS2iot
+      EMAIL_PASS: some-login-pass # Change this for sending emails with OS2iot
+      EMAIL_FROM: some-from-email@somehost.dk # Change this for sending emails with OS2iot
 
   os2iot-postgresql:
     restart: always
