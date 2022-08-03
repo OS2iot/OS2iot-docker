@@ -76,3 +76,48 @@ Solution:
 3. Change related ip of host.docker.internal and gateway.docker.internal to your new ip (found in terminal using the ipconfig command: e.g. 192.168.0.1)
 4. save
 5. restart the application.
+
+## Adding an ADR Algorithm
+When the ADR Algorithm has been tested, and is ready for deployment, it has to be built as a Go Module.
+
+The module is created running:
+```bash
+mkdir example-mod-name`.
+cd example-mod-name`.
+go mod init
+curl https://raw.githubusercontent.com/brocaar/chirpstack-network-server/master/examples/adr-plugin/main.go -o main.go
+```
+Replace the necessary parts in `main.go` with your own adr algorithm, and update the `go.mod` to include the required packages.
+Should be something like:
+```go
+module example-mod-name
+
+go <VERSION>
+
+require (
+	github.com/brocaar/chirpstack-network-server/v3 v3.15.5
+	github.com/hashicorp/go-plugin v1.4.0
+	github.com/sirupsen/logrus v1.8.1
+)
+```
+Run:
+```bash
+$env:GOOS="linux"
+$env:GOARCH="amd64"
+go build
+```
+and install the packages as described in the output of `go build`.
+finally `go build` can be run again to create the plugin, which is a binary with the name of your module `example-mod-name`.
+
+### Adding the Plugin to the Network Server
+If the default `docker-compose.yml` file is used, the folder `./configuration/chirpstack-network-server` is already copied to `/etc/chirpstack-network-server` in the docker container.
+Therefore a new folder can be added such as `./configuration/chirpstack-network-server/adr-plugins` in which the go module can be added.
+This makes the module available at `/etc/chirpstack-network-server/adr-plugins/example-mod-name` within the network server container.
+
+The last step is to specify the file as being an adr-plugin within the `chirpstack-network-server.toml` config file by adding `adr_plugins=["/etc/chirpstack-network-server/adr-plugins/example-mod-name"]` under `[network_server.network_settings]`, like this:
+```toml
+[network_server.network_settings]
+adr_plugins=["/etc/chirpstack-network-server/adr-plugins/example-mod-name"]
+```
+
+Your should now be able to restart the network server and the new adr algorithm should be available in the ChirpStack Application Server.
