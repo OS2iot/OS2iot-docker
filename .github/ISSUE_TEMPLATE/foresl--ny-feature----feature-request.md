@@ -16,8 +16,8 @@ Beskriv problemet klart og præcist. Fx jeg har ofte brug for, at kunne... //A c
 ### Beskriv det du gerne ser tilføjet til OS2iot // Describe the solution you'd like to add to OS2iot
 Giv en præcis beskrivelse af, hvad der skal tilføjes // A clear and concise description of what you want to add to the design system.
 
-### Beskriv de alternativer du har overvejet. (Describe alternatives you've considered)
-Giv en kort og præcis beskrivelse af alle de alternativer du har overvejet og hvorfor du foreslår den løsning du gør. (A clear and concise description of any alternative solutions or features you've considered, and why you've settled on that solution.)
+### Beskriv de alternativer du har overvejet // Describe alternatives you've considered
+Giv en kort og præcis beskrivelse af de alternativer du har overvejet, og hvorfor du foreslår den løsning, du gør // A clear and concise description of any alternative solutions or features you've considered, and why you've settled on that solution.
 
 ### Supplerende bemærkninger //Additional context
 Tilføj yderligere beskrivelser og billeder her, der forklarer dit forslag // Add any other context or screenshots about the feature request here.
