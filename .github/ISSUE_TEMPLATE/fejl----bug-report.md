@@ -2,7 +2,7 @@
 name: Fejl // Bug report
 about: Indmeld en fejl, og hjælp os med at forbedre OS2iot // Create a report to help
   us improve
-title: Gør overskriften beskrivende // Add a descriptive title
+title: 'BUG: [Gør overskriften beskrivende // Add a descriptive title]'
 labels: ''
 assignees: ''
 
@@ -29,5 +29,5 @@ Tilføj om muligt et eller flere billeder, der viser fejlen // If applicable, ad
 ### Log
 Tilføj om muligt relevant log med fejlbeskrivelser // If applicable, add relevant log with error descriptions.
 
-### Supplerende oplysninger (Additional context)
+### Supplerende oplysninger // Additional context
 Tilføj andre detaljer vedrørende fejlen // Add any other context about the problem here.
