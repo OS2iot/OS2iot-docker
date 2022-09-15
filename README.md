@@ -82,24 +82,12 @@ When the ADR Algorithm has been tested, and is ready for deployment, it has to b
 
 The module is created running:
 ```bash
-mkdir example-mod-name`.
-cd example-mod-name`.
-go mod init
+mkdir example-mod-name
+cd example-mod-name
+go mod init example-mod-name
 curl https://raw.githubusercontent.com/brocaar/chirpstack-network-server/master/examples/adr-plugin/main.go -o main.go
 ```
-Replace the necessary parts in `main.go` with your own adr algorithm, and update the `go.mod` to include the required packages.
-Should be something like:
-```go
-module example-mod-name
-
-go <VERSION>
-
-require (
-	github.com/brocaar/chirpstack-network-server/v3 v3.15.5
-	github.com/hashicorp/go-plugin v1.4.0
-	github.com/sirupsen/logrus v1.8.1
-)
-```
+Replace the necessary parts in `main.go` with your own adr algorithm.   
 Run:
 ```bash
 $env:GOOS="linux"
