@@ -17,6 +17,7 @@ net_id="000000"
 name="EU868"
 
 [network_server.network_settings]
+adr_plugins=["/etc/chirpstack-network-server/adr-modules/sensade-adr-mod/sensade-adr-mod"]
 
   [[network_server.network_settings.extra_channels]]
   frequency=867100000
