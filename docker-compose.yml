@@ -95,6 +95,9 @@ services:
       EMAIL_USER: some-login-email@somehost.dk # Change this for sending emails with OS2iot
       EMAIL_PASS: some-login-pass # Change this for sending emails with OS2iot
       EMAIL_FROM: some-from-email@somehost.dk # Change this for sending emails with OS2iot
+    volumes:
+      - ./configuration/mosquitto-broker-os2iot/ca.crt:/tmp/os2iot/backend/dist/resources/ca.crt
+      - ./configuration/mosquitto-broker-os2iot/ca.key:/tmp/os2iot/backend/dist/resources/ca.key
 
   os2iot-postgresql:
     restart: always
@@ -141,6 +144,21 @@ services:
       - os2iot-kafkadata:/var/lib/kafka/data
     depends_on:
       - os2iot-zookeeper
+
+  mosquitto-os2iot:
+    image: os2iot-mosquitto
+    ports:
+      - 8884:8884
+      - 8885:8885
+    build:
+      context: "./mosquitto-broker"
+      dockerfile: "Dockerfile"
+    volumes:
+      - ./configuration/mosquitto-broker-os2iot/ca.crt:/etc/mosquitto/ca_certificates/ca.crt
+      - ./configuration/mosquitto-broker-os2iot/ca.key:/etc/mosquitto/ca_certificates/ca.key
+      - ./configuration/mosquitto-broker-os2iot/server.key:/etc/mosquitto/certs/server.key
+      - ./configuration/mosquitto-broker-os2iot/server.crt:/etc/mosquitto/certs/server.crt
+      - ./configuration/mosquitto-broker-os2iot/mosquitto-os2iot.conf:/etc/mosquitto/conf.d/go-auth.conf
 
 volumes:
   pg-data:

@@ -1,0 +1,65 @@
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: {{ $.Chart.Name }}
+  labels:
+    helm.sh/chart: "{{ $.Chart.Name }}-{{ $.Chart.Version }}"
+    app.kubernetes.io/name: {{ $.Chart.Name }}
+    app.kubernetes.io/instance: {{ $.Chart.Name }}-{{ .Values.DOCKER_IMAGE_TAG }}
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+spec:
+  replicas: {{ .Values.REPLICAS }}
+  selector:
+    matchLabels:
+      app: {{ $.Chart.Name }}
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+    type: RollingUpdate
+  revisionHistoryLimit: {{ .Values.REVISION_HISTORY_LIMIT }}
+  template:
+    metadata:
+      labels:
+        app: {{ $.Chart.Name }}
+        version: "{{ $.Chart.Name }}-{{ .Values.DOCKER_IMAGE_TAG }}"
+    spec:
+      containers:
+        - name: {{ $.Chart.Name }}
+          image: "{{ .Values.deployment.image.repository }}:{{ .Values.deployment.image.tag }}"
+          imagePullPolicy: {{ .Values.deployment.image.pullPolicy }}
+          ports:
+            - name: mos-cert
+              containerPort: 8884
+              protocol: TCP
+            - name: mos-userpass
+              containerPort: 8885
+              protocol: TCP
+          resources:
+            limits:
+              cpu: 150m
+              memory: 512Mi
+            requests:
+              cpu: 5m
+              memory: 128Mi
+          volumeMounts:
+            - name: {{ $.Chart.Name }}-configmap
+              mountPath: /etc/mosquitto/conf.d/go-auth.conf
+              subPath: go-auth.conf
+            - name: secret-ca-crt
+              mountPath: /etc/mosquitto/ca_certificates
+              readOnly: true
+            - name: secret-server-key
+              mountPath: /etc/mosquitto/certs
+              readOnly: true
+      volumes:
+        - name: "{{ $.Chart.Name }}-configmap"
+          configMap:
+            name: "{{ $.Chart.Name }}-configmap"
+        - name: secret-ca-crt
+          secret:
+            secretName: ca-keys
+        - name: secret-server-key
+          secret:
+            secretName: server-keys
+      restartPolicy: Always

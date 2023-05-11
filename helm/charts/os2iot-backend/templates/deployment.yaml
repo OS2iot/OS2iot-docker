@@ -81,3 +81,17 @@ spec:
               value: some-login-pass
             - name: EMAIL_FROM
               value: some-from-email@somehost.dk
+           volumeMounts:
+            - name: secret-ca-crt
+              mountPath: /tmp/os2iot/backend/dist/resources
+              readOnly: true
+      volumes:
+        - name: "{{ $.Chart.Name }}-configmap"
+          configMap:
+            name: "{{ $.Chart.Name }}-configmap"
+        - name: secret-ca-crt
+          secret:
+            secretName: ca-keys
+      restartPolicy: Always
+
+            
