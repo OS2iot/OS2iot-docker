@@ -95,6 +95,9 @@ services:
       EMAIL_USER: some-login-email@somehost.dk # Change this for sending emails with OS2iot
       EMAIL_PASS: some-login-pass # Change this for sending emails with OS2iot
       EMAIL_FROM: some-from-email@somehost.dk # Change this for sending emails with OS2iot
+      MQTT_BROKER_HOSTNAME: # Change this to the public ip/hostname of the mqtt broker
+      ENCRYPTION_SYMMETRIC_KEY: # Change this to the symmetric key generated
+      CA_KEY_PASSWORD: # Change this to the password of the generated CA certificate key
     volumes:
       - ./configuration/mosquitto-broker-os2iot/ca.crt:/tmp/os2iot/backend/dist/resources/ca.crt
       - ./configuration/mosquitto-broker-os2iot/ca.key:/tmp/os2iot/backend/dist/resources/ca.key
