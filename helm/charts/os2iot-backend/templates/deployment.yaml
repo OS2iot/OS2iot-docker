@@ -81,6 +81,14 @@ spec:
               value: some-login-pass
             - name: EMAIL_FROM
               value: some-from-email@somehost.dk
+            - name: MQTT_SUPER_USER_PASSWORD 
+              value: some-super-user-password
+            - name: MQTT_BROKER_HOSTNAME
+              value: some-mqtt-broker-hostname
+            - name: ENCRYPTION_SYMMETRIC_KEY
+              value: some-encryption-symmetric-key
+            - name: CA_KEY_PASSWORD
+              value: some-ca-key-password
            volumeMounts:
             - name: secret-ca-crt
               mountPath: /tmp/os2iot/backend/dist/resources
