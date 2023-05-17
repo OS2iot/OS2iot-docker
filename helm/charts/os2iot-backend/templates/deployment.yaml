@@ -91,7 +91,7 @@ spec:
               value: some-ca-key-password
            volumeMounts:
             - name: secret-ca-crt
-              mountPath: /tmp/os2iot/backend/dist/resources
+              mountPath: /tmp/os2iot/backend/resources
               readOnly: true
       volumes:
         - name: "{{ $.Chart.Name }}-configmap"
