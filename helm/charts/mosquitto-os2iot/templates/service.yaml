@@ -1,0 +1,19 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: {{ $.Chart.Name }}-svc
+  labels:
+    app: {{ $.Chart.Name }}
+spec:
+  type: ClusterIP
+  ports:
+    - name: mosquitto-os2iot
+      port: 8884
+      targetPort: 8884
+      protocol: TCP
+    - name: mosquitto-os2iot
+      port: 8885
+      targetPort: 8885
+      protocol: TCP
+  selector:
+    app: {{ $.Chart.Name }}
