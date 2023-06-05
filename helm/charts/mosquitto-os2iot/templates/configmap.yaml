@@ -1,0 +1,57 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ $.Chart.Name }}-configmap
+data:
+  go-auth.conf: |
+    auth_plugin /home/mosquitto-go-auth/go-auth.so
+    listener 8885
+
+    cafile /etc/mosquitto/ca_certificates/ca.crt
+    keyfile /etc/mosquitto/certs/server.key
+    certfile /etc/mosquitto/certs/server.crt
+    tls_version tlsv1.3
+
+    auth_opt_backends postgres
+
+    auth_opt_pg_host {{ .Values.deployment.env.DATABASE_HOST }}
+    auth_opt_pg_port {{ .Values.deployment.env.DATABASE_PORT }}
+    auth_opt_pg_user {{ .Values.deployment.env.DATABASE_USERNAME }}
+    auth_opt_pg_password {{ .Values.deployment.env.DATABASE_PASSWORD }}
+    auth_opt_pg_dbname {{ .Values.deployment.env.DATABASE_NAME }}
+    auth_opt_pg_userquery SELECT mqttPassword FROM iot_device WHERE mqttUsername = $1 limit 1
+    auth_opt_pg_superquery SELECT COUNT(*) FROM iot_device WHERE (mqttusername = $1 AND permissions = 'superUser')
+    auth_opt_pg_aclquery SELECT mqttTopicName FROM iot_device WHERE (mqttUsername = $1 AND permissions = 'write') OR (9 = $2 AND mqttUsername = $1)
+
+    auth_opt_pg_sslmode verify-ca
+    auth_opt_hasher pbkdf2
+
+    auth_opt_hasher_salt_size 16
+    auth_opt_hasher_iterations 1000
+    auth_opt_hasher_keylen 32
+    auth_opt_hasher_algorithm sha512
+
+    auth_opt_retry_count 5
+    auth_opt_pg_connect_tries 5
+
+    listener 8884
+    require_certificate true
+    use_identity_as_username true
+
+    auth_opt_backends postgres
+
+    auth_opt_pg_host {{ .Values.deployment.env.DATABASE_HOST }}
+    auth_opt_pg_port {{ .Values.deployment.env.DATABASE_PORT }}
+    auth_opt_pg_user {{ .Values.deployment.env.DATABASE_USERNAME }}
+    auth_opt_pg_password {{ .Values.deployment.env.DATABASE_PASSWORD }}
+    auth_opt_pg_dbname {{ .Values.deployment.env.DATABASE_NAME }}
+    auth_opt_pg_userquery SELECT mqttPassword FROM iot_device WHERE mqttUsername = $1 limit 1
+    auth_opt_pg_superquery SELECT COUNT(*) FROM iot_device WHERE (mqttusername = $1 AND permissions = 'superUser')
+    auth_opt_pg_aclquery SELECT mqttTopicName FROM iot_device WHERE (mqttUsername = $1 AND permissions = 'write') OR (9 = $2 AND mqttUsername = $1)
+
+    auth_opt_pg_sslmode verify-ca
+
+    cafile /etc/mosquitto/ca_certificates/ca.crt
+    keyfile /etc/mosquitto/certs/server.key
+    certfile /etc/mosquitto/certs/server.crt
+    tls_version tlsv1.3

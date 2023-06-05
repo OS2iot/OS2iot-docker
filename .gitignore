@@ -1,1 +1,6 @@
 .idea/
+ca.crt
+ca.key
+server.crt
+server.key
+server.csr
