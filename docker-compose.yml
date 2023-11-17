@@ -3,24 +3,32 @@ version: "3.8"
 services:
   #Chirpstack
   chirpstack-network-server:
-    image: chirpstack/chirpstack-network-server:3.15
+    image: chirpstack/chirpstack-network-server:3.16.8
     volumes:
       - ./configuration/chirpstack-network-server:/etc/chirpstack-network-server
 
   chirpstack-application-server:
-    image: chirpstack/chirpstack-application-server:3.17
+    image: chirpstack/chirpstack-application-server:3.17.9
     ports:
       - 8080:8080
     volumes:
       - ./configuration/chirpstack-application-server:/etc/chirpstack-application-server
 
   chirpstack-gateway-bridge:
-    image: chirpstack/chirpstack-gateway-bridge:3.13
+    image: chirpstack/chirpstack-gateway-bridge:4.0.10
     ports:
       - 1700:1700/udp
     volumes:
       - ./configuration/chirpstack-gateway-bridge:/etc/chirpstack-gateway-bridge
 
+  chirpstack:
+    image: chirpstack/chirpstack:4.5
+    command: -c /etc/chirpstack
+    volumes:
+      - ./configuration/chirpstack:/etc/chirpstack
+    ports:
+      - 8084:8080
+      
   postgresql:
     image: postgres:9.6-alpine
     environment:
@@ -31,10 +39,22 @@ services:
       - ./configuration/postgresql/initdb:/docker-entrypoint-initdb.d
       - postgresqldata:/var/lib/postgresql/data
 
+  postgresNEW:
+    image: postgres:9.6-alpine
+    volumes:
+      - ./configuration/postgresNEW/initdb:/docker-entrypoint-initdb.d
+      - postgresqldata:/var/lib/postgresNEW/data
+    environment:
+      - POSTGRES_PASSWORD=root
+    ports: 
+      - 5435:5432
+      
   redis:
     image: redis:5-alpine
     volumes:
       - redisdata:/data
+    ports: 
+      - 6379:6379
 
   mosquitto:
     image: eclipse-mosquitto:2
