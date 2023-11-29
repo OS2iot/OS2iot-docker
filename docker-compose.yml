@@ -39,11 +39,11 @@ services:
       - ./configuration/postgresql/initdb:/docker-entrypoint-initdb.d
       - postgresqldata:/var/lib/postgresql/data
 
-  postgresNEW:
-    image: postgres:9.6-alpine
+  postgresCsV4:
+    image: postgres:bookworm
     volumes:
-      - ./configuration/postgresNEW/initdb:/docker-entrypoint-initdb.d
-      - postgresqldata:/var/lib/postgresNEW/data
+      - ./configuration/postgresCsV4/initdb:/docker-entrypoint-initdb.d
+      - postgresqldata:/var/lib/postgresCsV4/data
     environment:
       - POSTGRES_PASSWORD=root
     ports: 
