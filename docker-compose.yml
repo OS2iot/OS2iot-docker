@@ -107,8 +107,8 @@ services:
       KAFKA_PORT: 9092
       CS_MQTT_HOSTNAME: mosquitto
       CS_MQTT_PORT: 1883
-      CHIRPSTACK_APPLICATION_SERVER_HOSTNAME: chirpstack-application-server
-      CHIRPSTACK_NETWORK_SERVER: chirpstack-network-server
+      CHIRPSTACK_HOSTNAME: "localhost"
+      CHIRPSTACK_PORT: 8084
       LOG_LEVEL: debug
       EMAIL_PORT: 587
       EMAIL_HOST: smtp.ethereal.email # Change this for sending emails with OS2iot
@@ -119,6 +119,7 @@ services:
       ENCRYPTION_SYMMETRIC_KEY: # Change this to the symmetric key generated
       CA_KEY_PASSWORD: # Change this to the password of the generated CA certificate key
       MQTT_SUPER_USER_PASSWORD: # Change this to the password for the internal super user.
+      CHIRPSTACK_API_KEY: # Change this to the API_KEY created in chirpstack.
     volumes:
       - ./configuration/mosquitto-broker-os2iot/ca.crt:/tmp/os2iot/backend/dist/resources/ca.crt
       - ./configuration/mosquitto-broker-os2iot/ca.key:/tmp/os2iot/backend/dist/resources/ca.key
