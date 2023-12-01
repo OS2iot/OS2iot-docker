@@ -102,6 +102,8 @@ services:
     volumes:
       - ./configuration/mosquitto-broker-os2iot/ca.crt:/tmp/os2iot/backend/dist/resources/ca.crt
       - ./configuration/mosquitto-broker-os2iot/ca.key:/tmp/os2iot/backend/dist/resources/ca.key
+      - ./configuration/mosquitto-broker-os2iot/ca.crt:/tmp/os2iot/backend/resources/ca.crt
+      - ./configuration/mosquitto-broker-os2iot/ca.key:/tmp/os2iot/backend/resources/ca.key
 
   os2iot-postgresql:
     restart: always
