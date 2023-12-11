@@ -1,0 +1,27 @@
+[postgresql]
+dsn="postgres://chirpstack:chirpstack@postgresql/chirpstack?sslmode=disable"
+
+[redis]
+servers=[
+  "redis://redis:6379",
+]
+
+[network]
+  net_id="000000"
+  adr_plugins=[
+    "/etc/chirpstack/adr-modules/sensade-adr-mod/sensade-adr.js",
+  ]
+  enabled_regions=[
+    "eu868",
+  ]
+
+[api]
+bind="0.0.0.0:8080"
+jwt_secret="verysecret"
+
+[integration]
+enabled=["mqtt"]
+
+[integration.mqtt]
+server="tcp://mosquitto:1883"
+json=true
