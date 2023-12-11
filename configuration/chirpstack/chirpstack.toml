@@ -1,5 +1,5 @@
 [postgresql]
-dsn="postgres://chirpstack:chirpstack@postgresql/chirpstack?sslmode=disable"
+dsn="postgres://chirpstack:chirpstack@postgresCsV4/chirpstack?sslmode=disable"
 
 [redis]
 servers=[
