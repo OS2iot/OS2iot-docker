@@ -22,7 +22,7 @@ services:
       - ./configuration/chirpstack-gateway-bridge:/etc/chirpstack-gateway-bridge
 
   chirpstack:
-    image: chirpstack/chirpstack:4.5
+    image: chirpstack/chirpstack:4.6
     command: -c /etc/chirpstack
     volumes:
       - ./configuration/chirpstack:/etc/chirpstack
