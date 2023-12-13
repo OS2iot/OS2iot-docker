@@ -107,7 +107,7 @@ services:
       KAFKA_PORT: 9092
       CS_MQTT_HOSTNAME: mosquitto
       CS_MQTT_PORT: 1883
-      CHIRPSTACK_HOSTNAME: "localhost"
+      CHIRPSTACK_HOSTNAME: "localhost" # Change this to the chirpstack hostname
       CHIRPSTACK_PORT: 8080
       LOG_LEVEL: debug
       EMAIL_PORT: 587
