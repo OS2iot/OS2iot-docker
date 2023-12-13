@@ -8,9 +8,8 @@ servers=[
 
 [network]
   net_id="000000"
-  adr_plugins=[
-    "/etc/chirpstack/adr-modules/sensade-adr-mod/sensade-adr.js",
-  ]
+  adr_plugins=["/etc/chirpstack/adr-modules/sensade-adr-mod/sensade-adr.js"]
+  
   enabled_regions=[
     "eu868",
   ]

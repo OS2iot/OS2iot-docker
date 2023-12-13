@@ -1,0 +1,63 @@
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: {{ $.Chart.Name }}
+  labels:
+    helm.sh/chart: "{{ $.Chart.Name }}-{{ $.Chart.Version }}"
+    app.kubernetes.io/name: {{ $.Chart.Name }}
+    app.kubernetes.io/instance: {{ $.Chart.Name }}-{{ .Values.DOCKER_IMAGE_TAG }}
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+spec:
+  replicas: {{ .Values.REPLICAS }}
+  selector:
+    matchLabels:
+      app: {{ $.Chart.Name }}
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+    type: RollingUpdate
+  revisionHistoryLimit: {{ .Values.REVISION_HISTORY_LIMIT }}
+  template:
+    metadata:
+      labels:
+        app: {{ $.Chart.Name }}
+        version: "{{ $.Chart.Name }}-{{ .Values.DOCKER_IMAGE_TAG }}"
+        sidecar.istio.io/inject: "false"
+    spec:
+      containers:
+        - name: {{ $.Chart.Name }}
+          args: ["-c", "/etc/chirpstack"]
+          image: "{{ .Values.CONTAINER_REGISTRY }}/{{ .Values.DOCKER_IMAGE_NAME }}:{{ .Values.DOCKER_IMAGE_TAG }}"
+          imagePullPolicy: {{ .Values.DOCKER_IMAGE_PULL_POLICY }}
+          ports:
+            - name: grpc
+              containerPort: 8000
+              protocol: TCP
+            - name: http
+              containerPort: 8080
+              protocol: TCP
+          resources:
+            limits:
+              cpu: 150m
+              memory: 512Mi
+            requests:
+              cpu: 5m
+              memory: 128Mi
+          volumeMounts:
+            - name: {{ $.Chart.Name }}-configmap
+              mountPath: /etc/chirpstack/chirpstack.toml
+              subPath: chirpstack.toml
+            - name: {{ $.Chart.Name }}-configmap
+              mountPath: /etc/chirpstack/region_eu868.toml
+              subPath: region_eu868.toml
+            - name: persistent-storage
+              mountPath: /etc/chirpstack/
+      volumes:
+        - name: "{{ $.Chart.Name }}-configmap"
+          configMap:
+            name: "{{ $.Chart.Name }}-configmap"
+        - name: persistent-storage
+          persistentVolumeClaim:
+            claimName: persist-claim-chirpstack
+      restartPolicy: Always

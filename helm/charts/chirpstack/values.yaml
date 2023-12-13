@@ -1,0 +1,18 @@
+# Default values for aodb.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+# Registry the image comes from
+CONTAINER_REGISTRY: chirpstack
+
+# Image that needs to be used.
+DOCKER_IMAGE_NAME: chirpstack
+DOCKER_IMAGE_TAG: '4.6'
+
+DOCKER_IMAGE_PULL_POLICY: Always
+
+# How many replicas of the pod?
+REPLICAS: 1
+
+# How much revision history should be stored? (can clog up etcd)
+REVISION_HISTORY_LIMIT: 3
