@@ -78,7 +78,7 @@ Solution:
 5. restart the application.
 
 ## Adding an ADR Algorithm
-When the ADR Algorithm has been tested, and is ready for deployment, the ADR Algorithm has to be added to chirpstack.
+When the ADR Algorithm has been tested, and is ready for deployment, the ADR Algorithm has to be added to chirpstack. It is mandatory that the custom adr module is writtin in js.
 
 ### Adding the Plugin to Chirpstack
 If the default `docker-compose.yml` file is used, the folder `./configuration/chirpstack` is already copied to `/etc/chirpstack` in the docker container.

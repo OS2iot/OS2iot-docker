@@ -56,7 +56,7 @@ spec:
             - name: KAFKA_PORT
               value: '9092'
             - name: CHIRPSTACK_HOSTNAME
-              value: localhost
+              value: chirpstack-svc
             - name: CHIRPSTACK_PORT
               value: 8084
             - name: CS_MQTT_HOSTNAME
@@ -64,7 +64,7 @@ spec:
             - name: CS_MQTT_PORT
               value: '1883'
             - name: BACKEND_BASEURL
-              value: 'http://localhost:3000'
+              value: 'https://test-os2iot-backend.os2iot.dk'
             - name: KOMBIT_CERTIFICATEPRIVATEKEY
               value: "{{ .Values.KOMBIT_CERTIFICATEPRIVATEKEY }}"
             - name: KOMBIT_ENTRYPOINT

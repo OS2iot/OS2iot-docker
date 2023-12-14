@@ -39,11 +39,11 @@ services:
       - ./configuration/postgresql/initdb:/docker-entrypoint-initdb.d
       - postgresqldata:/var/lib/postgresql/data
 
-  postgresCsV4:
+  postgresChirpstackV4:
     image: postgres:bookworm
     volumes:
-      - ./configuration/postgresCsV4/initdb:/docker-entrypoint-initdb.d
-      - postgresqldata:/var/lib/postgresCsV4/data
+      - ./configuration/postgresChirpstackV4/initdb:/docker-entrypoint-initdb.d
+      - postgresqldata:/var/lib/postgresChirpstackV4/data
     environment:
       - POSTGRES_PASSWORD=root
     ports: 
@@ -107,7 +107,7 @@ services:
       KAFKA_PORT: 9092
       CS_MQTT_HOSTNAME: mosquitto
       CS_MQTT_PORT: 1883
-      CHIRPSTACK_HOSTNAME: "localhost" # Change this to the chirpstack hostname
+      CHIRPSTACK_HOSTNAME: "chirpstack-svc" # Change this to the chirpstack hostname
       CHIRPSTACK_PORT: 8080
       LOG_LEVEL: debug
       EMAIL_PORT: 587

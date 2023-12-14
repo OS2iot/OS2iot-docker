@@ -5,19 +5,15 @@ metadata:
 data:
   chirpstack.toml: |
     [postgresql]
-    dsn="postgres://chirpstack:chirpstack@postgresCsV4/chirpstack?sslmode=disable"
+    dsn="postgres://chirpstack:chirpstack@postgresChirpstackV4/chirpstack?sslmode=disable"
 
     [redis]
-    servers=[
-      "redis://redis:6379",
-    ]
+    servers=["redis://redis:6379"]
 
     [network]
     net_id="000000"
     adr_plugins=["/etc/chirpstack/adr-modules/sensade-adr-mod/sensade-adr.js"]
-    enabled_regions=[
-      "eu868",
-    ]
+    enabled_regions=["eu868"]
 
     [api]
     bind="0.0.0.0:8080"
