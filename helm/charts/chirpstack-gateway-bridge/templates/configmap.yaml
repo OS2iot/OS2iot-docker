@@ -7,8 +7,31 @@ data: # Remember this contains passwords - might be an idea to use secrets and e
     # See https://www.chirpstack.io/gateway-bridge/install/config/ for a full
     # configuration example and documentation.
 
-    [integration.mqtt.auth.generic]
-    servers=["tcp://mosquitto-svc:1883"]
-    username=""
-    password=""
+    # Integration configuration.
+    [integration]
+    # Payload marshaler.
+    #
+    # This defines how the MQTT payloads are encoded. Valid options are:
+    # * protobuf:  Protobuf encoding
+    # * json:      JSON encoding (for debugging)
+    marshaler="protobuf"
+
+      [integration.mqtt]
+      # Event topic template.
+      event_topic_template="gateway/{{ .GatewayID }}/event/{{ .EventType }}"
+
+      # State topic template.
+      state_topic_template="gateway/{{ .GatewayID }}/state/{{ .StateType }}"
+
+      # Command topic template.
+      command_topic_template="gateway/{{ .GatewayID }}/command/#"
+      [integration.mqtt.auth]
+        # Type defines the MQTT authentication type to use.
+        #
+        # Set this to the name of one of the sections below.
+        type="generic"
+        [integration.mqtt.auth.generic]
+        servers=["tcp://mosquitto-svc:1883"]
+        username=""
+        password=""
 
