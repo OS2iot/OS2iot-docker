@@ -3,24 +3,32 @@ version: "3.8"
 services:
   #Chirpstack
   chirpstack-network-server:
-    image: chirpstack/chirpstack-network-server:3.15
+    image: chirpstack/chirpstack-network-server:3.16.8
     volumes:
       - ./configuration/chirpstack-network-server:/etc/chirpstack-network-server
 
   chirpstack-application-server:
-    image: chirpstack/chirpstack-application-server:3.17
+    image: chirpstack/chirpstack-application-server:3.17.9
     ports:
-      - 8080:8080
+      - 8084:8080
     volumes:
       - ./configuration/chirpstack-application-server:/etc/chirpstack-application-server
 
   chirpstack-gateway-bridge:
-    image: chirpstack/chirpstack-gateway-bridge:3.13
+    image: chirpstack/chirpstack-gateway-bridge:4.0.10
     ports:
       - 1700:1700/udp
     volumes:
       - ./configuration/chirpstack-gateway-bridge:/etc/chirpstack-gateway-bridge
 
+  chirpstack:
+    image: chirpstack/chirpstack:4.6
+    command: -c /etc/chirpstack
+    volumes:
+      - ./configuration/chirpstack:/etc/chirpstack
+    ports:
+      - 8080:8080
+      
   postgresql:
     image: postgres:9.6-alpine
     environment:
@@ -31,10 +39,22 @@ services:
       - ./configuration/postgresql/initdb:/docker-entrypoint-initdb.d
       - postgresqldata:/var/lib/postgresql/data
 
+  postgresChirpstackV4:
+    image: postgres:bookworm
+    volumes:
+      - ./configuration/postgresChirpstackV4/initdb:/docker-entrypoint-initdb.d
+      - postgresqldata:/var/lib/postgresChirpstackV4/data
+    environment:
+      - POSTGRES_PASSWORD=root
+    ports: 
+      - 5435:5432
+      
   redis:
     image: redis:5-alpine
     volumes:
       - redisdata:/data
+    ports: 
+      - 6379:6379
 
   mosquitto:
     image: eclipse-mosquitto:2
@@ -87,8 +107,8 @@ services:
       KAFKA_PORT: 9092
       CS_MQTT_HOSTNAME: mosquitto
       CS_MQTT_PORT: 1883
-      CHIRPSTACK_APPLICATION_SERVER_HOSTNAME: chirpstack-application-server
-      CHIRPSTACK_NETWORK_SERVER: chirpstack-network-server
+      CHIRPSTACK_HOSTNAME: "chirpstack-svc" # Change this to the chirpstack hostname
+      CHIRPSTACK_PORT: 8080
       LOG_LEVEL: debug
       EMAIL_PORT: 587
       EMAIL_HOST: smtp.ethereal.email # Change this for sending emails with OS2iot
@@ -99,6 +119,7 @@ services:
       ENCRYPTION_SYMMETRIC_KEY: # Change this to the symmetric key generated
       CA_KEY_PASSWORD: # Change this to the password of the generated CA certificate key
       MQTT_SUPER_USER_PASSWORD: # Change this to the password for the internal super user.
+      CHIRPSTACK_API_KEY: # Change this to the API_KEY created in chirpstack.
     volumes:
       - ./configuration/mosquitto-broker-os2iot/ca.crt:/tmp/os2iot/backend/dist/resources/ca.crt
       - ./configuration/mosquitto-broker-os2iot/ca.key:/tmp/os2iot/backend/dist/resources/ca.key
