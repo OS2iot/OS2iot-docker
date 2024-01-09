@@ -5,14 +5,50 @@ metadata:
   labels:
     app: {{ $.Chart.Name }}
 spec:
-  type: ClusterIP
+  type: LoadBalancer
   ports:
     - name: http
       port: 8080
       targetPort: 8080
       protocol: TCP
+    - name: grpc-to-ns
+      port: 8001
+      targetPort: 8001
+      protocol: TCP
+    - name: grpc-join
+      port: 8003
+      targetPort: 8003
+      protocol: TCP
     - name: grpc
       port: 8000
+      targetPort: 8000
+      protocol: TCP
+  selector:
+    app: {{ $.Chart.Name }}
+
+kind: Service
+apiVersion: v1
+metadata:
+  name: {{ $.Chart.Name }}-clusterip-svc
+  labels:
+    app: {{ $.Chart.Name }}
+spec:
+  type: ClusterIP
+  ports:
+    - name: internal-http
+      port: 8081
+      targetPort: 8080
+      protocol: TCP
+    - name: internal-grpc-to-ns
+      port: 8002
+      targetPort: 8001
+      protocol: TCP
+    - name: internal-grpc-join
+      port: 8004
+      targetPort: 8003
+      protocol: TCP
+    - name: internal-grpc
+      port: 8005
       targetPort: 8000
       protocol: TCP
   selector:

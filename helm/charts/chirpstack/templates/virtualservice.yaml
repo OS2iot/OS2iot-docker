@@ -12,8 +12,8 @@ spec:
       route:
         - destination:
             port:
-              number: 8080
-            host: "{{ $.Chart.Name }}-svc"
+              number: 8081
+            host: "{{ $.Chart.Name }}-clusterip-svc"
           headers:
             response:
               add:
