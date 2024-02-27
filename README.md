@@ -80,15 +80,34 @@ Solution:
 ## Adding an ADR Algorithm
 When the ADR Algorithm has been tested, and is ready for deployment, the ADR Algorithm has to be added to chirpstack. It is mandatory that the custom adr module is writtin in js.
 
-### Adding the Plugin to Chirpstack
-If the default `docker-compose.yml` file is used, the folder `./configuration/chirpstack` is already copied to `/etc/chirpstack` in the docker container.
-Therefore a new folder can be added such as `./configuration/chirpstack/adr-plugins` in which the js file can be added.
-This makes the file available at `/etc/chirpstack/adr-plugins/example-file.js` within the chirpstack container.
+### Docker
 
-The last step is to specify the file as being an adr-plugin within the `chirpstack.toml` config file by adding `adr_plugins=["/etc/chirpstack/adr-plugins/example-file.js"]` under `[network]`, like this:
+If the default `docker-compose.yml` file is used, the folder `./configuration/chirpstack` is already copied to `/etc/chirpstack` in the docker container.
+Therefore a new folder can be added such as `./configuration/chirpstack/adr-modules` in which the js file can be added.
+This makes the file available at `/etc/chirpstack/adr-modules/example-file.js` within the chirpstack container.
+
+The last step is to specify the file as being an adr-plugin within the `chirpstack.toml` config file by adding `adr_plugins=["/etc/chirpstack/adr-modules/example-file.js"]` under `[network]`, like this:
 ```toml
 [network]
     adr_plugins=["/etc/chirpstack/adr-plugins/example-file.js"]
 ```
 
 Your should now be able to restart the chirpstack server and the new adr algorithm should be available in Chirpstack.
+
+### Helm
+
+When hosting via helm the steps are slightly different.
+
+1. Make sure that the persistent volume claim belonging to the chirpstack server has exists in your hosted setup.
+2. Find the actual name of the chirpstack pod. This can be done in a few ways. If you're have a connection via a GUI like `Lens` it can be found under the `Pods` list. If you're hosting on an Azure Kubernetes service, it can be found under the side menu `Workloads -> Pods`
+3. Use `kubectl` to copy the module into the pod
+   ```bash
+   kubectl cp ./path/to/module/adr-modules chirpstack-xxxxxxxxx-xxxxx:/etc/chirpstack/adr-modules
+   ```
+4. Update `configmap.yaml` located under `/helm/charts/chirpstack/templates` with the path to the plugin under `[network]`, like this:
+   ```
+   [network]
+   adr_plugins=["/etc/chirpstack/adr-modules/example-mod-name"]
+   ```
+   The first line already exists
+5. Once the helm chart has redeployed restart the chirpstack server to enable the new module.
