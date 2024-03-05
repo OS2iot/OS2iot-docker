@@ -78,34 +78,38 @@ Solution:
 5. restart the application.
 
 ## Adding an ADR Algorithm
-When the ADR Algorithm has been tested, and is ready for deployment, it has to be built as a Go Module.
+When the ADR Algorithm has been tested, and is ready for deployment, the ADR Algorithm has to be added to chirpstack. It is mandatory that the custom adr module is writtin in js.
 
-The module is created running:
-```bash
-mkdir example-mod-name
-cd example-mod-name
-go mod init example-mod-name
-curl https://raw.githubusercontent.com/brocaar/chirpstack-network-server/master/examples/adr-plugin/main.go -o main.go
-```
-Replace the necessary parts in `main.go` with your own adr algorithm.   
-Run:
-```bash
-$env:GOOS="linux"
-$env:GOARCH="amd64"
-go build
-```
-and install the packages as described in the output of `go build`.
-finally `go build` can be run again to create the plugin, which is a binary with the name of your module `example-mod-name`.
+## Adding the Plugin to Chirpstack
 
-### Adding the Plugin to the Network Server
-If the default `docker-compose.yml` file is used, the folder `./configuration/chirpstack-network-server` is already copied to `/etc/chirpstack-network-server` in the docker container.
-Therefore a new folder can be added such as `./configuration/chirpstack-network-server/adr-plugins` in which the go module can be added.
-This makes the module available at `/etc/chirpstack-network-server/adr-plugins/example-mod-name` within the network server container.
+### Docker
 
-The last step is to specify the file as being an adr-plugin within the `chirpstack-network-server.toml` config file by adding `adr_plugins=["/etc/chirpstack-network-server/adr-plugins/example-mod-name"]` under `[network_server.network_settings]`, like this:
+If the default `docker-compose.yml` file is used, the folder `./configuration/chirpstack` is already copied to `/etc/chirpstack` in the docker container.
+Therefore a new folder can be added such as `./configuration/chirpstack/adr-modules` in which the js file can be added.
+This makes the file available at `/etc/chirpstack/adr-modules/example-file.js` within the chirpstack container.
+
+The last step is to specify the file as being an adr-plugin within the `chirpstack.toml` config file by adding `adr_plugins=["/etc/chirpstack/adr-modules/example-file.js"]` under `[network]`, like this:
 ```toml
-[network_server.network_settings]
-adr_plugins=["/etc/chirpstack-network-server/adr-plugins/example-mod-name"]
+[network]
+    adr_plugins=["/etc/chirpstack/adr-modules/example-file.js"]
 ```
 
-Your should now be able to restart the network server and the new adr algorithm should be available in the ChirpStack Application Server.
+You should now be able to restart the chirpstack server and the new adr algorithm should be available in Chirpstack.
+
+### Helm
+
+When hosting via helm the steps are slightly different.
+
+1. Make sure that the persistent volume claim belonging to the chirpstack exists in your hosted setup.
+2. Find the actual name of the network-server pod. This can be done in a few ways. If you're have a connection via a GUI like `Lens` it can be found under the `Pods` list. If you're hosting on an Azure Kubernetes service, it can be found under the side menu `Workloads -> Pods`
+3. Use `kubectl` to copy the module into the pod
+   ```bash
+   kubectl cp ./path/to/module/adr-module chirpstack-xxxxxxxxx-xxxxx:/etc/chirpstack/adr-modules
+   ```
+4. Update `configmap.yaml` located under `/helm/charts/chirpstack/templates` with the path to the plugin under `[network]`, like this:
+   ```toml
+   [network]
+       adr_plugins=["/etc/chirpstack/adr-modules/example-file.js"]
+   ```
+   The first line already exists
+5. Once the helm chart has redeployed restart the network server to enable the new module.

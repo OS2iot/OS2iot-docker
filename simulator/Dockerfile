@@ -10,7 +10,7 @@ RUN apt-get update && apt-get install golang -y
 
 RUN apt-get install ca-certificates -y
 
-RUN git clone https://github.com/UniCT-ARSLab/LWN-Simulator.git
+RUN git clone --branch v1.0.2 https://github.com/UniCT-ARSLab/LWN-Simulator.git
 
 WORKDIR /LWN-Simulator
 

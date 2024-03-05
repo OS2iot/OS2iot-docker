@@ -1,0 +1,163 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ $.Chart.Name }}-configmap
+data:
+  chirpstack.toml: |
+    [postgresql]
+    dsn="postgres://chirpstack:chirpstack@postgresChirpstackV4/chirpstack?sslmode=disable"
+
+    [redis]
+    servers=["redis://redis:6379"]
+
+    [network]
+    net_id="000000"
+    adr_plugins=["/etc/chirpstack/adr-modules/sensade-adr-mod/sensade-adr.js"]
+    enabled_regions=["eu868"]
+
+    [api]
+    bind="0.0.0.0:8080"
+    jwt_secret="verysecret"
+
+    [integration]
+    enabled=["mqtt"]
+
+    [integration.mqtt]
+    server="tcp://mosquitto:1883"
+    json=true
+
+  region_eu868.toml: |
+    # This file contains an example EU868 configuration.
+    [[regions]]
+
+    # ID is an user-defined identifier for this region.
+    id="eu868"
+
+    # Description is a short description for this region.
+    description="EU868"
+
+    # Common-name refers to the common-name of this region as defined by
+    # the LoRa Alliance.
+    common_name="EU868"
+
+
+    # Gateway configuration.
+    [regions.gateway]
+
+      # Force gateways as private.
+      #
+      # If enabled, gateways can only be used by devices under the same tenant.
+      force_gws_private=false
+
+
+      # Gateway backend configuration.
+      [regions.gateway.backend]
+
+        # The enabled backend type.
+        enabled="mqtt"
+
+        # MQTT configuration.
+        [regions.gateway.backend.mqtt]
+
+          topic_prefix=""
+
+          # MQTT server (e.g. scheme://host:port where scheme is tcp, ssl or ws)
+          server="tcp://mosquitto:1883"
+
+      # Gateway channel configuration.
+      #
+      # Note: this configuration is only used in case the gateway is using the
+      # ChirpStack Concentratord daemon. In any other case, this configuration
+      # is ignored.
+      [[regions.gateway.channels]]
+        frequency=868100000
+        bandwidth=125000
+        modulation="LORA"
+        spreading_factors=[7, 8, 9, 10, 11, 12]
+
+      [[regions.gateway.channels]]
+        frequency=868300000
+        bandwidth=125000
+        modulation="LORA"
+        spreading_factors=[7, 8, 9, 10, 11, 12]
+
+      [[regions.gateway.channels]]
+        frequency=868500000
+        bandwidth=125000
+        modulation="LORA"
+        spreading_factors=[7, 8, 9, 10, 11, 12]
+
+      [[regions.gateway.channels]]
+        frequency=867100000
+        bandwidth=125000
+        modulation="LORA"
+        spreading_factors=[7, 8, 9, 10, 11, 12]
+
+      [[regions.gateway.channels]]
+        frequency=867300000
+        bandwidth=125000
+        modulation="LORA"
+        spreading_factors=[7, 8, 9, 10, 11, 12]
+
+      [[regions.gateway.channels]]
+        frequency=867500000
+        bandwidth=125000
+        modulation="LORA"
+        spreading_factors=[7, 8, 9, 10, 11, 12]
+
+      [[regions.gateway.channels]]
+        frequency=867700000
+        bandwidth=125000
+        modulation="LORA"
+        spreading_factors=[7, 8, 9, 10, 11, 12]
+
+      [[regions.gateway.channels]]
+        frequency=867900000
+        bandwidth=125000
+        modulation="LORA"
+        spreading_factors=[7, 8, 9, 10, 11, 12]
+
+      [[regions.gateway.channels]]
+        frequency=868300000
+        bandwidth=250000
+        modulation="LORA"
+        spreading_factors=[7]
+
+      [[regions.gateway.channels]]
+        frequency=868800000
+        bandwidth=125000
+        modulation="FSK"
+        datarate=50000
+
+
+    # Region specific network configuration.
+    [regions.network]
+
+      # Below is the common set of extra channels. Please make sure that these
+      # channels are also supported by the gateways.
+      [[regions.network.extra_channels]]
+      frequency=867100000
+      min_dr=0
+      max_dr=7
+
+      [[regions.network.extra_channels]]
+      frequency=867300000
+      min_dr=0
+      max_dr=7
+
+      [[regions.network.extra_channels]]
+      frequency=867500000
+      min_dr=0
+      max_dr=7
+
+      [[regions.network.extra_channels]]
+      frequency=867700000
+      min_dr=0
+      max_dr=7
+
+      [[regions.network.extra_channels]]
+      frequency=867900000
+      min_dr=0
+      max_dr=7
+
+  
