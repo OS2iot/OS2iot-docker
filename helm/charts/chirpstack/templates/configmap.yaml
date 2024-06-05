@@ -133,6 +133,12 @@ data:
     # Region specific network configuration.
     [regions.network]
 
+      # Minimum data-rate.
+      min_dr=0
+
+      # Maximum data-rate.
+      max_dr=7
+
       # Below is the common set of extra channels. Please make sure that these
       # channels are also supported by the gateways.
       [[regions.network.extra_channels]]
