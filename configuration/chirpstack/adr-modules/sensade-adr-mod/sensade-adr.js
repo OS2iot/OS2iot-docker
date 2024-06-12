@@ -12,7 +12,7 @@ export function id() {
 //
 // Input object example:
 // {
-//  regionConfigId: "eu868",
+//  regionName: "eu868",
 //  regionCommonName: "EU868",
 //  devEui: "0102030405060708",
 //  macVersion: "1.0.3",
