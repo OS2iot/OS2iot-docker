@@ -1,5 +1,3 @@
-version: "3.8"
-
 services:
   #Chirpstack
   chirpstack-network-server:
@@ -10,14 +8,14 @@ services:
   chirpstack-application-server:
     image: chirpstack/chirpstack-application-server:3.17.9
     ports:
-      - 8084:8080
+      - '8080'
     volumes:
       - ./configuration/chirpstack-application-server:/etc/chirpstack-application-server
 
   chirpstack-gateway-bridge:
     image: chirpstack/chirpstack-gateway-bridge:4.0.10
     ports:
-      - 1700:1700/udp
+      - '1700/udp'
     volumes:
       - ./configuration/chirpstack-gateway-bridge:/etc/chirpstack-gateway-bridge
 
@@ -27,14 +25,14 @@ services:
     volumes:
       - ./configuration/chirpstack:/etc/chirpstack
     ports:
-      - 8080:8080
+      - '8080'
       
   postgresql:
     image: postgres:9.6-alpine
     environment:
       - POSTGRES_PASSWORD=root
     ports:
-      - 5434:5432
+      - '5432'
     volumes:
       - ./configuration/postgresql/initdb:/docker-entrypoint-initdb.d
       - postgresqldata:/var/lib/postgresql/data
@@ -47,30 +45,30 @@ services:
     environment:
       - POSTGRES_PASSWORD=root
     ports: 
-      - 5435:5432
+      - '5432'
       
   redis:
     image: redis:5-alpine
     volumes:
       - redisdata:/data
     ports: 
-      - 6379:6379
+      - '6379'
 
   mosquitto:
     image: eclipse-mosquitto:2
     ports:
-      - 1883:1883
+      - '1883'
     volumes:
       - ./configuration/eclipse-mosquitto/mosquitto.conf:/mosquitto/config/mosquitto.conf
 
   #OS2IoT
   os2iot-frontend:
-    image: "os2iot-frontend"
+    image: os2iot-frontend
     build:
-      context: "../OS2IoT-frontend"
-      dockerfile: "Dockerfile-prod"
+      context: ../OS2IoT-frontend
+      dockerfile: Dockerfile-prod
     ports:
-      - "8081:8081"
+      - '8081'
     environment:
       PRODUCTION: "false"
       BASE_URL: http://localhost:3000/api/v1/
@@ -78,23 +76,23 @@ services:
 
   #OS2IoT
   os2iot-lorawanSimulator:
-    image: "os2iot-lorawan_simulator"
+    image: os2iot-lorawan_simulator
     build:
-      context: "./simulator"
-      dockerfile: "Dockerfile"
+      context: ./simulator
+      dockerfile: Dockerfile
     ports:
-      - "8768:8000"
+      - '8000'
 
   os2iot-backend:
-    image: "os2iot-backend"
+    image: os2iot-backend
     build:
       context: ../OS2IoT-backend
       dockerfile: Dockerfile
       target: prod
     ports:
-      - 3000:3000
+      - '3000'
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:3000/status"]
+      test: ["CMD", "curl", "-f", "http://os2iot-backend:3000/status"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -130,7 +128,7 @@ services:
     restart: always
     image: postgis/postgis # We need postgis to store geodata
     ports:
-      - 5433:5432
+      - '5432'
     hostname: os2iot-pg
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U os2iot"]
@@ -146,20 +144,20 @@ services:
       - pg-data:/var/lib/postgresql:Z
 
   os2iot-zookeeper:
-    image: "bitnami/zookeeper:latest"
+    image: bitnami/zookeeper:latest
     ports:
-      - "2181:2181"
+      - '2181'
     environment:
       - ALLOW_ANONYMOUS_LOGIN=yes
     volumes:
       - os2iot-zookeeperdata:/data
-    tmpfs: "/datalog"
+    tmpfs: /datalog
 
   os2iot-kafka:
-    image: "bitnami/kafka:latest"
+    image: bitnami/kafka:latest
     ports:
-      - "9092:9092"
-      - "9093:9093"
+      - '9092'
+      - '9093'
     environment:
       - KAFKA_BROKER_ID=1
       - KAFKA_LISTENERS=PLAINTEXT://:9092,INTERNAL://:9093
@@ -174,12 +172,12 @@ services:
 
   mosquitto-os2iot:
     image: os2iot-mosquitto
-    ports:
-      - 8884:8884
-      - 8885:8885
     build:
-      context: "./mosquitto-broker"
-      dockerfile: "Dockerfile"
+      context: ./mosquitto-broker
+      dockerfile: Dockerfile
+    ports:
+      - '8884'
+      - '8885'
     volumes:
       - ./configuration/mosquitto-broker-os2iot/ca.crt:/etc/mosquitto/ca_certificates/ca.crt
       - ./configuration/mosquitto-broker-os2iot/ca.key:/etc/mosquitto/ca_certificates/ca.key
