@@ -43,20 +43,19 @@ export function id() {
 //  txPowerIndex: 1,
 //  nbTrans: 1
 // }
+
 // Handle function for ADR request.
 export function handle(req) {
   // This defines the default response, which is equal to the current device state.
   let resp = {
-    dr: req.DR,
-    txPowerIndex: req.TxPowerIndex,
-    nbTrans: req.NbTrans,
+    dr: req.dr,
+    txPowerIndex: 0,
+    nbTrans: req.nbTrans,
   };
 
-  resp.txPowerIndex = 0;
-
   // If ADR is disabled, return with current values.
-  if (!req.ADR) {
-    return [resp, null];
+  if (!req.adr) {
+    return resp;
   }
 
   let lostPackageCnt = getLostPackageCount(req);
@@ -64,7 +63,7 @@ export function handle(req) {
   if (lostPackageCnt >= 5) {
     resp.dr -= 1;
   } else if (
-    req.UplinkHistory.length === 20 &&
+    req.uplinkHistory.length >= 20 &&
     getLostPackageCount(req, 20) <= 2
   ) {
     // If 2 or fewer packages are lost during the last 20 received packages, the dr might be able to be increased
@@ -78,7 +77,7 @@ export function handle(req) {
     // A margin of around 10 seems okay
     // This value has been chosen based on the loRaSNR values from sensors installed in a parking lot,
     // where a fluctuation of +- 10 can be seen (should be caused by cars parking and leaving).
-    let diffSNR = minSNR - req.requiredHistoryCount - installationMargin;
+    let diffSNR = minSNR - req.requiredSnrForDr - installationMargin;
 
     // Examples:
     // minSNR = -5
@@ -104,11 +103,11 @@ export function handle(req) {
     resp.dr = req.maxDr;
   }
 
-  if (req.MinDR > resp.dr) {
-    resp.dr = req.MinDR;
+  if (req.minDr > resp.dr) {
+    resp.dr = req.minDr;
   }
 
-  return [resp, null];
+  return resp;
 }
 
 function getMinSNR(req) {
@@ -144,12 +143,12 @@ function getLostPackageCount(req, ...lastXElement) {
     const m = elements[i];
 
     if (i === 0) {
-      previousFCnt = m.FCnt;
+      previousFCnt = m.fCnt;
       continue;
     }
 
-    lostPackets += m.FCnt - previousFCnt - 1; // there is always an expected difference of 1
-    previousFCnt = m.FCnt;
+    lostPackets += m.fCnt - previousFCnt - 1; // there is always an expected difference of 1
+    previousFCnt = m.fCnt;
   }
 
   return lostPackets;
