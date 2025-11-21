@@ -58,6 +58,8 @@ RUN git clone https://github.com/iegomez/mosquitto-go-auth.git
 
 WORKDIR /home/mosquitto-go-auth
 
+RUN git checkout tags/2.1.0
+
 RUN make
 
 WORKDIR /etc/mosquitto/conf.d
