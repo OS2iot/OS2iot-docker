@@ -1,19 +1,24 @@
-FROM ubuntu
+FROM golang:1.21-bookworm
 
-RUN apt-get update && apt-get install make
+ARG LWN_SIMULATOR_VERSION=v1.0.3
 
-RUN apt-get update && apt-get install git -y
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    ca-certificates \
+    git \
+    make \
+    && rm -rf /var/lib/apt/lists/*
 
-ARG DEBIAN_FRONTEND=noninteractive
+WORKDIR /app
 
-RUN apt-get update && apt-get install golang -y
+RUN git clone --depth 1 --branch ${LWN_SIMULATOR_VERSION} https://github.com/UniCT-ARSLab/LWN-Simulator.git . \
+    && make install-dep
 
-RUN apt-get install ca-certificates -y
+# Create non-root user with home directory for Go cache
+RUN useradd -r -m -s /sbin/nologin simulator \
+    && chown -R simulator:simulator /app
 
-RUN git clone --branch v1.0.2 https://github.com/UniCT-ARSLab/LWN-Simulator.git
+USER simulator
 
-WORKDIR /LWN-Simulator
+EXPOSE 8000
 
-RUN make install-dep
-
-CMD make run
+CMD ["make", "run"]

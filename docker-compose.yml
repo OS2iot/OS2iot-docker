@@ -1,25 +1,13 @@
-version: "3.8"
-
 services:
-  #Chirpstack
-  chirpstack-network-server:
-    image: chirpstack/chirpstack-network-server:3.16.8
-    volumes:
-      - ./configuration/chirpstack-network-server:/etc/chirpstack-network-server
-
-  chirpstack-application-server:
-    image: chirpstack/chirpstack-application-server:3.17.9
-    ports:
-      - 8084:8080
-    volumes:
-      - ./configuration/chirpstack-application-server:/etc/chirpstack-application-server
-
   chirpstack-gateway-bridge:
     image: chirpstack/chirpstack-gateway-bridge:4.0.10
     ports:
-      - 1700:1700/udp
+      - "1700"
     volumes:
       - ./configuration/chirpstack-gateway-bridge:/etc/chirpstack-gateway-bridge
+    depends_on:
+      mosquitto:
+        condition: service_healthy
 
   chirpstack:
     image: chirpstack/chirpstack:4.6
@@ -27,41 +15,76 @@ services:
     volumes:
       - ./configuration/chirpstack:/etc/chirpstack
     ports:
-      - 8080:8080
-      
-  postgresql:
-    image: postgres:9.6-alpine
+      - "8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      mosquitto:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q -O /dev/null http://127.0.0.1:8080 || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  postgres:
+    image: postgres:bookworm
+    volumes:
+      - ./configuration/postgres/initdb:/docker-entrypoint-initdb.d
+      - postgresqldata:/var/lib/postgres/data
     environment:
       - POSTGRES_PASSWORD=root
     ports:
-      - 5434:5432
-    volumes:
-      - ./configuration/postgresql/initdb:/docker-entrypoint-initdb.d
-      - postgresqldata:/var/lib/postgresql/data
+      - "5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
-  postgresChirpstackV4:
-    image: postgres:bookworm
-    volumes:
-      - ./configuration/postgresChirpstackV4/initdb:/docker-entrypoint-initdb.d
-      - postgresqldata:/var/lib/postgresChirpstackV4/data
-    environment:
-      - POSTGRES_PASSWORD=root
-    ports: 
-      - 5435:5432
-      
   redis:
     image: redis:5-alpine
     volumes:
       - redisdata:/data
-    ports: 
-      - 6379:6379
+    ports:
+      - "6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   mosquitto:
     image: eclipse-mosquitto:2
     ports:
-      - 1883:1883
+      - "1883"
     volumes:
       - ./configuration/eclipse-mosquitto/mosquitto.conf:/mosquitto/config/mosquitto.conf
+    healthcheck:
+      test: ["CMD-SHELL", "mosquitto_sub -t '$$SYS/#' -C 1 -i healthcheck -W 3"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Nginx reverse proxy
+  nginx:
+    image: nginx:alpine
+    ports:
+      - "80"
+    volumes:
+      - ./configuration/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      os2iot-frontend:
+        condition: service_started
+      os2iot-backend:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q -O /dev/null http://127.0.0.1:80 || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   #OS2IoT
   os2iot-frontend:
@@ -70,11 +93,16 @@ services:
       context: "../OS2IoT-frontend"
       dockerfile: "Dockerfile-prod"
     ports:
-      - "8081:8081"
+      - "8081"
     environment:
       PRODUCTION: "false"
-      BASE_URL: http://localhost:3000/api/v1/
+      BASE_URL: /api/v1/
       TABLE_PAGE_SIZE: 25
+    healthcheck:
+      test: ["CMD-SHELL", "bash -c 'echo > /dev/tcp/127.0.0.1/8081'"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   #OS2IoT
   os2iot-lorawanSimulator:
@@ -83,7 +111,7 @@ services:
       context: "./simulator"
       dockerfile: "Dockerfile"
     ports:
-      - "8768:8000"
+      - "8768"
 
   os2iot-backend:
     image: "os2iot-backend"
@@ -92,34 +120,40 @@ services:
       dockerfile: Dockerfile
       target: prod
     ports:
-      - 3000:3000
+      - "3000"
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:3000/status"]
+      test: ["CMD-SHELL", "wget -q -O /dev/null http://127.0.0.1:3000/api/v1/ || exit 1"]
       interval: 10s
       timeout: 5s
       retries: 5
+      start_period: 60s
     depends_on:
-      - os2iot-postgresql
+      os2iot-postgresql:
+        condition: service_healthy
+      os2iot-kafka:
+        condition: service_healthy
+      chirpstack:
+        condition: service_healthy
     environment:
-      DATABASE_HOSTNAME: os2iot-postgresql
-      DATABASE_PORT: 5432
-      KAFKA_HOSTNAME: os2iot-kafka
-      KAFKA_PORT: 9092
-      CS_MQTT_HOSTNAME: mosquitto
-      CS_MQTT_PORT: 1883
-      CHIRPSTACK_HOSTNAME: "chirpstack-svc" # Change this to the chirpstack hostname
-      CHIRPSTACK_PORT: 8080
-      LOG_LEVEL: debug
-      EMAIL_PORT: 587
-      EMAIL_HOST: smtp.ethereal.email # Change this for sending emails with OS2iot
-      EMAIL_USER: some-login-email@somehost.dk # Change this for sending emails with OS2iot
-      EMAIL_PASS: some-login-pass # Change this for sending emails with OS2iot
-      EMAIL_FROM: some-from-email@somehost.dk # Change this for sending emails with OS2iot
-      MQTT_BROKER_HOSTNAME: # Change this to the public ip/hostname of the mqtt broker
-      ENCRYPTION_SYMMETRIC_KEY: # Change this to the symmetric key generated
-      CA_KEY_PASSWORD: # Change this to the password of the generated CA certificate key
-      MQTT_SUPER_USER_PASSWORD: # Change this to the password for the internal super user.
-      CHIRPSTACK_API_KEY: # Change this to the API_KEY created in chirpstack.
+      DATABASE_HOSTNAME: ${DATABASE_HOSTNAME:-os2iot-postgresql}
+      DATABASE_PORT: ${DATABASE_PORT:-5432}
+      KAFKA_HOSTNAME: ${KAFKA_HOSTNAME:-os2iot-kafka}
+      KAFKA_PORT: ${KAFKA_PORT:-9092}
+      CS_MQTT_HOSTNAME: ${CS_MQTT_HOSTNAME:-mosquitto}
+      CS_MQTT_PORT: ${CS_MQTT_PORT:-1883}
+      CHIRPSTACK_HOSTNAME: ${CHIRPSTACK_HOSTNAME:-chirpstack}
+      CHIRPSTACK_PORT: ${CHIRPSTACK_PORT:-8080}
+      LOG_LEVEL: ${LOG_LEVEL:-debug}
+      EMAIL_PORT: ${EMAIL_PORT:-587}
+      EMAIL_HOST: ${EMAIL_HOST:-smtp.ethereal.email}
+      EMAIL_USER: ${EMAIL_USER:-}
+      EMAIL_PASS: ${EMAIL_PASS:-}
+      EMAIL_FROM: ${EMAIL_FROM:-}
+      MQTT_BROKER_HOSTNAME: ${MQTT_BROKER_HOSTNAME:-mosquitto-os2iot}
+      ENCRYPTION_SYMMETRIC_KEY: ${ENCRYPTION_SYMMETRIC_KEY:-0123456789abcdef0123456789abcdef}
+      CA_KEY_PASSWORD: ${CA_KEY_PASSWORD:-}
+      MQTT_SUPER_USER_PASSWORD: ${MQTT_SUPER_USER_PASSWORD:-super_user_password}
+      CHIRPSTACK_API_KEY: ${CHIRPSTACK_API_KEY:-} # Create in ChirpStack UI: http://localhost:8080 -> API Keys
     volumes:
       - ./configuration/mosquitto-broker-os2iot/ca.crt:/tmp/os2iot/backend/dist/resources/ca.crt
       - ./configuration/mosquitto-broker-os2iot/ca.key:/tmp/os2iot/backend/dist/resources/ca.key
@@ -130,7 +164,7 @@ services:
     restart: always
     image: postgis/postgis # We need postgis to store geodata
     ports:
-      - 5433:5432
+      - "5433"
     hostname: os2iot-pg
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U os2iot"]
@@ -146,37 +180,49 @@ services:
       - pg-data:/var/lib/postgresql:Z
 
   os2iot-zookeeper:
-    image: "bitnami/zookeeper:latest"
+    image: "confluentinc/cp-zookeeper:7.6.0"
     ports:
-      - "2181:2181"
+      - "2181"
     environment:
-      - ALLOW_ANONYMOUS_LOGIN=yes
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
     volumes:
-      - os2iot-zookeeperdata:/data
-    tmpfs: "/datalog"
+      - os2iot-zookeeperdata:/var/lib/zookeeper/data
+    healthcheck:
+      test: ["CMD-SHELL", "bash -c 'echo ruok > /dev/tcp/localhost/2181'"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
 
   os2iot-kafka:
-    image: "bitnami/kafka:latest"
+    image: "confluentinc/cp-kafka:7.6.0"
     ports:
-      - "9092:9092"
-      - "9093:9093"
+      - "9092"
+      - "9093"
     environment:
-      - KAFKA_BROKER_ID=1
-      - KAFKA_LISTENERS=PLAINTEXT://:9092,INTERNAL://:9093
-      - KAFKA_ADVERTISED_LISTENERS=PLAINTEXT://os2iot-kafka:9092,INTERNAL://127.0.0.1:9093
-      - KAFKA_LISTENER_SECURITY_PROTOCOL_MAP=PLAINTEXT:PLAINTEXT,INTERNAL:PLAINTEXT
-      - KAFKA_ZOOKEEPER_CONNECT=os2iot-zookeeper:2181
-      - ALLOW_PLAINTEXT_LISTENER=yes
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: os2iot-zookeeper:2181
+      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092,INTERNAL://0.0.0.0:9093
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://os2iot-kafka:9092,INTERNAL://127.0.0.1:9093
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,INTERNAL:PLAINTEXT
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
     volumes:
       - os2iot-kafkadata:/var/lib/kafka/data
     depends_on:
-      - os2iot-zookeeper
+      os2iot-zookeeper:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "kafka-broker-api-versions --bootstrap-server localhost:9092"]
+      interval: 10s
+      timeout: 10s
+      retries: 5
 
   mosquitto-os2iot:
     image: os2iot-mosquitto
     ports:
-      - 8884:8884
-      - 8885:8885
+      - "8884"
+      - "8885"
     build:
       context: "./mosquitto-broker"
       dockerfile: "Dockerfile"
@@ -186,6 +232,14 @@ services:
       - ./configuration/mosquitto-broker-os2iot/server.key:/etc/mosquitto/certs/server.key
       - ./configuration/mosquitto-broker-os2iot/server.crt:/etc/mosquitto/certs/server.crt
       - ./configuration/mosquitto-broker-os2iot/mosquitto-os2iot.conf:/etc/mosquitto/conf.d/go-auth.conf
+    depends_on:
+      os2iot-postgresql:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "bash -c 'echo > /dev/tcp/127.0.0.1/8885'"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
 volumes:
   pg-data:

@@ -1,0 +1,216 @@
+version: '3'
+
+vars:
+  PARENT_DIR: '{{.ROOT_DIR}}/..'
+  BACKEND_DIR: '{{.PARENT_DIR}}/OS2IoT-backend'
+  FRONTEND_DIR: '{{.PARENT_DIR}}/OS2IoT-frontend'
+
+tasks:
+  default:
+    desc: Show available tasks
+    cmds:
+      - task --list
+    silent: true
+
+  # Setup tasks
+  setup:
+    desc: Run all setup steps (clone repos, fix line endings, generate certs)
+    cmds:
+      - task: setup:clone-repos
+      - task: setup:fix-line-endings
+      - task: setup:certs
+      - task: setup:check
+
+  setup:clone-repos:
+    desc: Clone OS2IoT-backend and OS2IoT-frontend to sibling directories
+    silent: true
+    cmds:
+      - |
+        if [ ! -d "{{.BACKEND_DIR}}" ]; then
+          echo "Cloning OS2IoT-backend..."
+          git clone https://github.com/OS2iot/OS2IoT-backend.git "{{.BACKEND_DIR}}"
+        else
+          echo "OS2IoT-backend already exists"
+        fi
+      - |
+        if [ ! -d "{{.FRONTEND_DIR}}" ]; then
+          echo "Cloning OS2IoT-frontend..."
+          git clone https://github.com/OS2iot/OS2IoT-frontend.git "{{.FRONTEND_DIR}}"
+        else
+          echo "OS2IoT-frontend already exists"
+        fi
+
+  setup:fix-line-endings:
+    desc: Fix line endings on database init scripts (for Windows/cross-platform)
+    silent: true
+    cmds:
+      - |
+        if command -v dos2unix &> /dev/null; then
+          dos2unix configuration/os2iot-postgresql/initdb/*.sh 2>/dev/null || true
+          dos2unix configuration/postgres/initdb/*.sh 2>/dev/null || true
+          dos2unix configuration/postgresql/initdb/*.sh 2>/dev/null || true
+          echo "Line endings fixed"
+        else
+          echo "dos2unix not installed - skipping (install with: apt install dos2unix)"
+        fi
+
+  setup:certs:
+    desc: Generate MQTT broker certificates (CA and server)
+    silent: true
+    dir: configuration/mosquitto-broker-os2iot
+    cmds:
+      - |
+        if [ -f "ca.crt" ] && [ -f "ca.key" ] && [ -f "server.crt" ] && [ -f "server.key" ]; then
+          echo "Certificates already exist"
+        else
+          # Remove directories if they exist (created by Docker when files were missing)
+          rm -rf ca.crt ca.key server.crt server.key ca.srl server.csr 2>/dev/null || true
+          echo "Generating CA certificate..."
+          openssl genrsa -out ca.key 2048
+          openssl req -new -x509 -days 3650 -key ca.key -out ca.crt -subj "/CN=OS2IoT-CA"
+          echo "Generating server certificate..."
+          openssl genrsa -out server.key 2048
+          openssl req -new -key server.key -out server.csr -subj "/CN=mosquitto-os2iot"
+          openssl x509 -req -in server.csr -CA ca.crt -CAkey ca.key -CAcreateserial -out server.crt -days 3650
+          rm -f server.csr
+          chmod 644 ca.key server.key
+          echo "Certificates generated successfully"
+        fi
+
+  setup:check:
+    desc: Verify sibling repos exist and show status
+    silent: true
+    cmds:
+      - |
+        echo "=== Setup Status ==="
+        if [ -d "{{.BACKEND_DIR}}" ]; then
+          echo "✓ OS2IoT-backend: found"
+        else
+          echo "✗ OS2IoT-backend: NOT FOUND (run: task setup:clone-repos)"
+        fi
+        if [ -d "{{.FRONTEND_DIR}}" ]; then
+          echo "✓ OS2IoT-frontend: found"
+        else
+          echo "✗ OS2IoT-frontend: NOT FOUND (run: task setup:clone-repos)"
+        fi
+        if [ -f "configuration/mosquitto-broker-os2iot/ca.crt" ] && [ -f "configuration/mosquitto-broker-os2iot/ca.key" ]; then
+          echo "✓ MQTT certificates: found"
+        else
+          echo "✗ MQTT certificates: NOT FOUND (run: task setup:certs)"
+        fi
+
+  setup:org:
+    desc: Create default organization (requires services running)
+    silent: true
+    cmds:
+      - |
+        NGINX_PORT=$(docker compose port nginx 80 | cut -d: -f2)
+        if [ -z "$NGINX_PORT" ]; then
+          echo "✗ Services not running (run: docker compose up --detach)"
+          exit 1
+        fi
+        TOKEN=$(curl -s -X POST "http://localhost:${NGINX_PORT}/api/v1/auth/login" \
+          -H "Content-Type: application/json" \
+          -d '{"username":"global-admin@os2iot.dk","password":"hunter2"}' | jq -r '.accessToken')
+        if [ "$TOKEN" = "null" ] || [ -z "$TOKEN" ]; then
+          echo "✗ Failed to login - ensure services are running"
+          exit 1
+        fi
+        RESULT=$(curl -s -X POST "http://localhost:${NGINX_PORT}/api/v1/organization" \
+          -H "Authorization: Bearer $TOKEN" \
+          -H "Content-Type: application/json" \
+          -d '{"name":"Default Organization"}')
+        if echo "$RESULT" | grep -q '"id"'; then
+          echo "✓ Default Organization created"
+        else
+          echo "Organization may already exist or error: $RESULT"
+        fi
+
+  setup:chirpstack:
+    desc: Configure ChirpStack API key for LoRaWAN integration
+    silent: true
+    cmds:
+      - |
+        CHIRPSTACK_PORT=$(docker compose port chirpstack 8080 2>/dev/null | cut -d: -f2)
+        if [ -z "$CHIRPSTACK_PORT" ]; then
+          echo "✗ ChirpStack not running (run: docker compose up --detach)"
+          exit 1
+        fi
+        echo "=== ChirpStack API Key Setup ==="
+        echo ""
+        echo "1. Opening ChirpStack UI at http://localhost:${CHIRPSTACK_PORT}"
+        echo "2. Login with: admin / admin"
+        echo "3. Go to: API Keys (in the left menu)"
+        echo "4. Click 'Add API key'"
+        echo "5. Give it a name and click 'Submit'"
+        echo "6. Copy the generated token"
+        echo ""
+        # Try to open in browser
+        if command -v xdg-open &> /dev/null; then
+          xdg-open "http://localhost:${CHIRPSTACK_PORT}" 2>/dev/null &
+        elif command -v open &> /dev/null; then
+          open "http://localhost:${CHIRPSTACK_PORT}" 2>/dev/null &
+        fi
+        echo "Paste your API key here (or press Ctrl+C to cancel):"
+        read -r API_KEY
+        if [ -n "$API_KEY" ]; then
+          if [ -f ".env" ]; then
+            if grep -q "^CHIRPSTACK_API_KEY=" .env; then
+              sed -i.bak "s/^CHIRPSTACK_API_KEY=.*/CHIRPSTACK_API_KEY=${API_KEY}/" .env && rm -f .env.bak
+              echo "✓ Updated CHIRPSTACK_API_KEY in .env"
+            else
+              echo "CHIRPSTACK_API_KEY=${API_KEY}" >> .env
+              echo "✓ Added CHIRPSTACK_API_KEY to .env"
+            fi
+          else
+            echo "CHIRPSTACK_API_KEY=${API_KEY}" > .env
+            echo "✓ Created .env with CHIRPSTACK_API_KEY"
+          fi
+          echo ""
+          echo "Restarting backend to apply changes..."
+          docker compose up -d os2iot-backend
+          echo "✓ Done! Backend restarted with new API key"
+        else
+          echo "✗ No API key provided"
+        fi
+
+  open:chirpstack:
+    desc: Open ChirpStack UI in browser
+    cmds:
+      - |
+        URL="http://$(docker compose port chirpstack 8080)"
+        if command -v xdg-open &> /dev/null; then
+          xdg-open "$URL"
+        elif command -v open &> /dev/null; then
+          open "$URL"
+        else
+          echo "Open in browser: $URL"
+        fi
+
+  status:
+    desc: Show status of all containers
+    cmds:
+      - docker compose ps --format 'table {{"{{"}}.Name{{"}}"}}	{{"{{"}}.Status{{"}}"}}'
+
+  build:
+    desc: Build all images without starting
+    cmds:
+      - docker compose build
+
+  clean:
+    desc: Remove all containers, volumes, and images for this project
+    cmds:
+      - docker compose down --volumes --rmi local
+
+  open:
+    desc: Open the frontend in browser
+    cmds:
+      - |
+        URL="http://$(docker compose port nginx 80)"
+        if command -v xdg-open &> /dev/null; then
+          xdg-open "$URL"
+        elif command -v open &> /dev/null; then
+          open "$URL"
+        else
+          echo "Open in browser: $URL"
+        fi

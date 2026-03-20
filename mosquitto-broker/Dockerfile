@@ -1,70 +1,73 @@
-FROM ubuntu
+# Build stage
+FROM ubuntu:22.04 AS builder
 
-RUN apt-get update && apt-get install libwebsockets-dev libc-ares2 libc-ares-dev openssl uuid uuid-dev gcc libssl-dev g++ golang-go wget git make -y
+ARG MOSQUITTO_VERSION=2.0.15
+ARG GO_AUTH_VERSION=2.1.0
 
-RUN cd /home
+# Install build dependencies in single layer
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential \
+    ca-certificates \
+    g++ \
+    gcc \
+    git \
+    golang-go \
+    libcjson-dev \
+    libc-ares-dev \
+    libssl-dev \
+    libwebsockets-dev \
+    make \
+    mosquitto-dev \
+    libmosquitto-dev \
+    openssl \
+    uuid-dev \
+    wget \
+    && rm -rf /var/lib/apt/lists/*
 
-RUN wget http://mosquitto.org/files/source/mosquitto-2.0.15.tar.gz
+# Build Mosquitto with WebSocket support
+WORKDIR /build
+RUN wget -q https://mosquitto.org/files/source/mosquitto-${MOSQUITTO_VERSION}.tar.gz \
+    && tar xzf mosquitto-${MOSQUITTO_VERSION}.tar.gz \
+    && cd mosquitto-${MOSQUITTO_VERSION} \
+    && sed -i 's/WITH_WEBSOCKETS:=no/WITH_WEBSOCKETS:=yes/g' config.mk \
+    && make \
+    && make install DESTDIR=/build/mosquitto-install
 
-RUN tar xzvf mosquitto-2.0.15.tar.gz
+# Build mosquitto-go-auth plugin
+WORKDIR /build
+RUN git clone --depth 1 --branch ${GO_AUTH_VERSION} https://github.com/iegomez/mosquitto-go-auth.git \
+    && cd mosquitto-go-auth \
+    && make
 
-WORKDIR mosquitto-2.0.15
+# Runtime stage
+FROM ubuntu:22.04
 
-RUN sed -i 's/WITH_WEBSOCKETS:=no/WITH_WEBSOCKETS:=yes/g' config.mk
+# Install only runtime dependencies
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    ca-certificates \
+    libc-ares2 \
+    libcjson1 \
+    libssl3 \
+    libwebsockets16 \
+    && rm -rf /var/lib/apt/lists/*
 
-RUN apt install libcjson1 libcjson-dev
+# Copy Mosquitto from builder
+COPY --from=builder /build/mosquitto-install/usr/local/ /usr/local/
 
-RUN make
+# Copy go-auth plugin to expected location
+COPY --from=builder /build/mosquitto-go-auth/go-auth.so /home/mosquitto-go-auth/go-auth.so
 
-RUN make install
+# Update library cache
+RUN ldconfig
 
-RUN groupadd mosquitto
+# Create mosquitto user and directories
+RUN groupadd -r mosquitto \
+    && useradd -r -s /sbin/nologin -g mosquitto -d /var/lib/mosquitto mosquitto \
+    && mkdir -p /var/log/mosquitto /var/lib/mosquitto /etc/mosquitto/conf.d \
+    && chown -R mosquitto:mosquitto /var/log/mosquitto /var/lib/mosquitto
 
-RUN useradd -s /sbin/nologin mosquitto -g mosquitto -d /var/lib/mosquitto
+EXPOSE 1883 8883 8884 8885 9001
 
-RUN mkdir -p /var/log/mosquitto/ /var/lib/mosquitto/
+USER mosquitto
 
-RUN chown -R mosquitto:mosquitto /var/log/mosquitto/
-
-RUN chown -R mosquitto:mosquitto /var/lib/mosquitto/
-
-WORKDIR /etc/systemd/system
-
-RUN touch mosquitto.service
-
-RUN echo "[Unit] \n\
-Description=Mosquitto MQTT v3.1/v5 server \n\
-Wants=network.target \n\
-Documentation=http://mosquitto.org/documentation/ \n\
-\n\
-[Service] \n\
-Type=simple \n\
-User=mosquitto \n\
-Group=mosquitto \n\
-ExecStart=/usr/local/sbin/mosquitto -c /etc/mosquitto/mosquitto.conf \n\
-Restart=on-failure \n\
-SyslogIdentifier=Mosquitto \n\
-\n\
-[Install] \n\
-WantedBy=multi-user.target " >> /etc/systemd/system/mosquitto.service
-
-WORKDIR /usr/local/include
-
-RUN apt install mosquitto-dev libmosquitto-dev -y
-
-WORKDIR /home/
-
-RUN git clone https://github.com/iegomez/mosquitto-go-auth.git
-
-WORKDIR /home/mosquitto-go-auth
-
-RUN make
-
-WORKDIR /etc/mosquitto/conf.d
-
-RUN touch go-auth.conf
-
-CMD mosquitto -c /etc/mosquitto/conf.d/go-auth.conf 
-
-
-
+CMD ["mosquitto", "-c", "/etc/mosquitto/conf.d/go-auth.conf"]

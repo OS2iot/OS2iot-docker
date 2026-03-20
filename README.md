@@ -1,6 +1,6 @@
 # OS2IoT-docker
 
-This repository contains the docker-compose file and configuration needed to run the OS2IoT project.
+This repository contains the Docker Compose file and configuration needed to run the OS2IoT project.
 
 Documentation is available at: https://os2iot.readthedocs.io/en/latest/
 
@@ -18,8 +18,76 @@ OS2IoT
 From the `OS2IoT-docker` folder in a suitable terminal use:
 
 ```
-docker-compose up
+docker compose up --detach
 ```
+
+### Quick Start with Task Runner (Recommended)
+
+This project includes a [Taskfile](https://taskfile.dev/) to simplify common operations. Install go-task first:
+
+```bash
+# macOS
+brew install go-task
+
+# Linux (snap)
+sudo snap install task --classic
+
+# Other methods: https://taskfile.dev/installation/
+```
+
+**Full setup from scratch:**
+
+```bash
+# 1. Clone repos, fix line endings, and generate certificates
+task setup
+
+# 2. Build and start all services
+docker compose up --build --detach
+
+# 3. Wait for services to be healthy (check with: docker compose ps)
+#    The backend may take a minute to initialize the database
+
+# 4. Create default organization (required for frontend to work)
+task setup:org
+
+# 5. Open the frontend in browser
+task open
+```
+
+**Default login credentials:**
+- Email: `global-admin@os2iot.dk`
+- Password: `hunter2`
+
+**Available tasks:**
+
+```bash
+task setup              # Clone sibling repos, fix line endings, generate certs
+task setup:check        # Verify setup status
+task setup:org          # Create default organization (requires services running)
+task setup:chirpstack   # Configure ChirpStack API key (for LoRaWAN integration)
+task status             # Show status of all containers
+task build              # Build all Docker images
+task clean              # Remove containers, volumes, and images
+task open               # Open frontend in browser
+```
+
+### ChirpStack Integration (Optional)
+
+If you're using LoRaWAN features, you need to configure the ChirpStack API key:
+
+```bash
+# Run the setup task - it will guide you through the process
+task setup:chirpstack
+```
+
+Or manually:
+1. Open ChirpStack UI: `task open:chirpstack`
+2. Login with `admin` / `admin`
+3. Go to **API Keys** → Create a new API key
+4. Add to `.env` file: `CHIRPSTACK_API_KEY=your-key-here`
+5. Restart backend: `docker compose up -d os2iot-backend`
+
+Without this configuration, you'll see `InvalidToken` errors in the backend logs - these can be ignored if you're not using LoRaWAN features.
 
 ## Configuration
 
@@ -28,7 +96,7 @@ Edit the files in the configuration folder to adjust settings for each requireme
 ## Contents
 
 - Postgres from the official image.
-- Chirpstack using their docker-compose
+- Chirpstack using their Docker Compose
 
 ## Troubleshooting FAQ
 
@@ -43,7 +111,7 @@ ERROR: Encountered errors while bringing up the project.
 ```
 
 Cause:
-Docker doesn't have acceess to mount the volumes.
+Docker doesn't have access to mount the volumes.
 
 Solution:
 On Windows: Go to Docker Desktop (tray icon) -> Settings -> Resources -> File Sharing -> Add the directory which is the parent directory of "OS2IoT-docker" or a parent of that. -> Apply & Restart
@@ -61,24 +129,24 @@ Cause:
 Database has not been setup correctly on local machine.
 
 Solution:
-docker-compose down --volumes
-dos2unix configuration/os2iot-postgresql/initdb/\* <-- Skal køres fra git bash
-docker-compose up
+docker compose down --volumes
+dos2unix configuration/os2iot-postgresql/initdb/*  # Run from git bash on Windows
+docker compose up
 
 ### error: Error: connect ETIMEDOUT xxx.xxx.xxx.xxx:xxxx at TCPConnectWrap.afterConnect [as oncomplete] (net.js:1141:16)
 
 Cause:
-Docker is trying to connect to the wrong ip.
+Docker is trying to connect to the wrong IP.
 
 Solution:
 1. Navigate to hosts file: C:\Windows\System32\drivers\etc
 2. Open hosts file as administrator
-3. Change related ip of host.docker.internal and gateway.docker.internal to your new ip (found in terminal using the ipconfig command: e.g. 192.168.0.1)
-4. save
-5. restart the application.
+3. Change related IP of host.docker.internal and gateway.docker.internal to your new IP (found in terminal using the ipconfig command: e.g. 192.168.0.1)
+4. Save
+5. Restart the application.
 
 ## Adding an ADR Algorithm
-When the ADR Algorithm has been tested, and is ready for deployment, the ADR Algorithm has to be added to chirpstack. It is mandatory that the custom adr module is writtin in js.
+When the ADR Algorithm has been tested, and is ready for deployment, the ADR Algorithm has to be added to chirpstack. It is mandatory that the custom ADR module is written in JavaScript.
 
 ## Adding the Plugin to Chirpstack
 
@@ -98,18 +166,4 @@ You should now be able to restart the chirpstack server and the new adr algorith
 
 ### Helm
 
-When hosting via helm the steps are slightly different.
-
-1. Make sure that the persistent volume claim belonging to the chirpstack exists in your hosted setup.
-2. Find the actual name of the network-server pod. This can be done in a few ways. If you're have a connection via a GUI like `Lens` it can be found under the `Pods` list. If you're hosting on an Azure Kubernetes service, it can be found under the side menu `Workloads -> Pods`
-3. Use `kubectl` to copy the module into the pod
-   ```bash
-   kubectl cp ./path/to/module/adr-module chirpstack-xxxxxxxxx-xxxxx:/etc/chirpstack/adr-modules
-   ```
-4. Update `configmap.yaml` located under `/helm/charts/chirpstack/templates` with the path to the plugin under `[network]`, like this:
-   ```toml
-   [network]
-       adr_plugins=["/etc/chirpstack/adr-modules/example-file.js"]
-   ```
-   The first line already exists
-5. Once the helm chart has redeployed restart the network server to enable the new module.
+See <https://github.com/OS2iot/OS2IoT-helm> for an example Helm setup.
