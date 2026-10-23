@@ -146,7 +146,7 @@ services:
       - pg-data:/var/lib/postgresql:Z
 
   os2iot-zookeeper:
-    image: "bitnami/zookeeper:latest"
+    image: "soldevelo/zookeeper:latest"
     ports:
       - "2181:2181"
     environment:
@@ -156,7 +156,7 @@ services:
     tmpfs: "/datalog"
 
   os2iot-kafka:
-    image: "bitnami/kafka:latest"
+    image: "soldevelo/kafka:latest"
     ports:
       - "9092:9092"
       - "9093:9093"
